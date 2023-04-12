@@ -42,10 +42,14 @@ class _HomePageState extends State<HomePage> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 children: [
-                  _buildGridItem(context, 'Button 1', Colors.blue),
-                  _buildGridItem(context, 'Button 2', Colors.red),
-                  _buildGridItem(context, 'Button 3', Colors.green),
-                  _buildGridItem(context, 'Button 4', Colors.orange),
+                  _buildGridItem(
+                      context, 'Menu', 'assets/images/chef-hat-64.png'),
+                  _buildGridItem(context, 'Order Process',
+                      'assets/images/chef-hat-64.png'),
+                  _buildGridItem(context, 'Order History',
+                      'assets/images/chef-hat-64.png'),
+                  _buildGridItem(
+                      context, 'Edit Profile', 'assets/images/chef-hat-64.png'),
                 ],
               ),
             ],
@@ -55,12 +59,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildGridItem(BuildContext context, String label, Color color) {
+  Widget _buildGridItem(BuildContext context, String label, String imgUrl) {
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: color,
+          backgroundColor: Color(0xFFFFA500),
           minimumSize: Size(0, 80),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
@@ -71,12 +75,19 @@ class _HomePageState extends State<HomePage> {
             content: Text(label),
           ));
         },
-        child: Text(
-          label,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image(image: AssetImage(imgUrl)),
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              label,
+              style: TextStyle(color: Colors.black, fontSize: 16),
+            )
+          ],
         ),
       ),
     );

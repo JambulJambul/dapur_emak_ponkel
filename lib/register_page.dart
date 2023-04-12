@@ -96,7 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                     child: Text('Register'),
                     style: ElevatedButton.styleFrom(
-                      primary: Color(0xFFFFA500),
+                      backgroundColor: Color(0xFFFFA500),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),

@@ -3,6 +3,8 @@ import 'login_page.dart';
 import 'register_page.dart';
 import 'forgot_password.dart';
 import 'home_page.dart';
+import 'view_menu.dart';
+import 'cart.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,7 +31,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      home: const CartPage(),
     );
   }
 }
