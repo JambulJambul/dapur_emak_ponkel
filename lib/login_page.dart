@@ -1,6 +1,3 @@
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,12 +13,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final appBarHeight = AppBar().preferredSize.height;
     final formPadding = size.width * 0.1;
     final textFieldWidth = size.width * 0.8;
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xFFFFA500),
         title: Text('Login Page'),
       ),
       body: SingleChildScrollView(
@@ -31,13 +28,20 @@ class _LoginPageState extends State<LoginPage> {
             top: formPadding,
             left: formPadding,
             right: formPadding,
-            bottom: size.height - (appBarHeight * 2) - (formPadding * 3),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(height: size.height * 0.05),
+              SizedBox(
+                height: 100,
+                width: 100,
+                child: CircleAvatar(
+                  backgroundImage:
+                      AssetImage('assets/images/attachment_121740866.png'),
+                ),
+              ),
               SizedBox(
                 width: textFieldWidth,
                 child: TextField(
@@ -65,7 +69,27 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     _loginPressed(context);
                   },
+                  style: ElevatedButton.styleFrom(primary: Color(0xFFFFA500)),
                   child: Text('Login'),
+                ),
+              ),
+              SizedBox(height: size.height * 0.02),
+              TextButton(
+                onPressed: () {
+                  // Forgot Password logic
+                },
+                child: Text(
+                  'Forgot Password',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Create New Account logic
+                },
+                child: Text(
+                  'Create New Account',
+                  style: TextStyle(color: Colors.grey[600]),
                 ),
               ),
             ],
