@@ -4,7 +4,11 @@ import 'register_page.dart';
 import 'forgot_password.dart';
 import 'home_page.dart';
 import 'view_menu.dart';
+import 'payment_page.dart';
 import 'cart.dart';
+import 'edit_profile_page.dart';
+import 'order_history_page.dart';
+import 'owner_home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +35,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const CartPage(),
+      home: const OwnerHomePage(),
     );
   }
 }

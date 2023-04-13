@@ -99,22 +99,6 @@ class _CartPageState extends State<CartPage> {
               },
             ),
             SizedBox(height: size.height * 0.05),
-            DropdownButton<String>(
-              value: _selectedPaymentOption,
-              hint: Text('Select Payment Option'),
-              items: <String>['Bank Transfer', 'E-Wallet']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedPaymentOption = newValue!;
-                });
-              },
-            ),
             SizedBox(
               width: buttonWidth,
               child: ElevatedButton(
