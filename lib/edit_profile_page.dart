@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login_page.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -103,6 +105,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   ),
                 ),
+                SizedBox(height: size.height * 0.02),
+                SizedBox(
+                  width: textFieldWidth,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _logoutPressed(context);
+                    },
+                    child: Text('Logout'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 255, 0, 0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -115,5 +133,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
     String address = _addressController.text.trim();
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
+  }
+
+  void _logoutPressed(BuildContext context) async {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    await _auth.signOut();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LoginPage(),
+      ),
+    );
   }
 }

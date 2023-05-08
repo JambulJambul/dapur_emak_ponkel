@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "481588120065",
+    "project_id": "dapuremakponkel-2c750",
+    "storage_bucket": "dapuremakponkel-2c750.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481588120065:android:8757bdcda5467a94858e00",
+        "android_client_info": {
+          "package_name": "com.example.dapur_emak_ponkel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "481588120065-qii4qg5jnnno48d23omauj44dbhnvptk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dapur_emak_ponkel",
+            "certificate_hash": "c53ca5e67f6abeef3c35d06b2bb56feeb005ec7d"
+          }
+        },
+        {
+          "client_id": "481588120065-n2a2is10lnl8j6551f412iqd2af72amr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAT2AktfkPU_mpHJ3dKmhqTzg7Y1JFMYdo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "481588120065-63dh55cufp81t0ag6l3nna2e7m6293ja.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

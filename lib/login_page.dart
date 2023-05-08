@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'home_page.dart';
+import 'forgot_password.dart';
+import 'register_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -10,98 +15,170 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  var errormessage = 0;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final formPadding = size.width * 0.1;
     final textFieldWidth = size.width * 0.8;
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFFFFA500),
-        title: Text('Login Page'),
-      ),
-      body: SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        child: Padding(
-          padding: EdgeInsets.only(
-            top: formPadding,
-            left: formPadding,
-            right: formPadding,
+    return WillPopScope(
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Color(0xFFFFA500),
+            automaticallyImplyLeading: false,
+            title: Text('Login Page'),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: size.height * 0.05),
-              SizedBox(
-                height: 100,
-                width: 100,
-                child: CircleAvatar(
-                  backgroundImage:
-                      AssetImage('assets/images/attachment_121740866.png'),
-                ),
+          body: SingleChildScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: formPadding,
+                left: formPadding,
+                right: formPadding,
               ),
-              SizedBox(
-                width: textFieldWidth,
-                child: TextField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    labelText: 'Username',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: size.height * 0.05),
+                  SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: CircleAvatar(
+                      backgroundImage:
+                          AssetImage('assets/images/attachment_121740866.png'),
+                    ),
                   ),
-                ),
-              ),
-              SizedBox(height: size.height * 0.02),
-              SizedBox(
-                width: textFieldWidth,
-                child: TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
+                  SizedBox(
+                    width: textFieldWidth,
+                    child: TextField(
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        labelText: 'Username',
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(height: size.height * 0.02),
+                  SizedBox(
+                    width: textFieldWidth,
+                    child: TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.05),
+                  SizedBox(
+                    width: textFieldWidth,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _loginPressed(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFFFA500)),
+                      child: Text('Login'),
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.02),
+                  if (errormessage == 1)
+                    Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.red,
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(
+                            8,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Please enter a correct email and password",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        )),
+                  SizedBox(height: size.height * 0.02),
+                  TextButton(
+                    onPressed: () {
+                      _forgotPasswordButton(context);
+                    },
+                    child: Text(
+                      'Forgot Password',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      _registerButton(context);
+                    },
+                    child: Text(
+                      'Create New Account',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: size.height * 0.05),
-              SizedBox(
-                width: textFieldWidth,
-                child: ElevatedButton(
-                  onPressed: () {
-                    _loginPressed(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFFA500)),
-                  child: Text('Login'),
-                ),
-              ),
-              SizedBox(height: size.height * 0.02),
-              TextButton(
-                onPressed: () {
-                  // Forgot Password logic
-                },
-                child: Text(
-                  'Forgot Password',
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  // Create New Account logic
-                },
-                child: Text(
-                  'Create New Account',
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
-      ),
-    );
+        onWillPop: () async {
+          // Show a confirmation dialog
+          bool shouldClose = await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Confirm'),
+                content: Text('Are you sure you want to exit?'),
+                actions: <Widget>[
+                  ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text('No'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => SystemNavigator.pop(),
+                    child: Text('Yes'),
+                  ),
+                ],
+              );
+            },
+          );
+
+          // Return the result of the confirmation dialog
+          return shouldClose;
+        });
   }
 
-  void _loginPressed(BuildContext context) {
+  void _loginPressed(BuildContext context) async {
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
+    try {
+      final credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: username, password: password);
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => HomePage(),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+      errormessage = 1;
+    }
+  }
+
+  void _forgotPasswordButton(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => ForgotPassword()));
+  }
+
+  void _registerButton(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => RegisterPage()));
   }
 }

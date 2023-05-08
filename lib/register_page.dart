@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'login_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -6,6 +9,9 @@ class RegisterPage extends StatefulWidget {
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _fullNameController = TextEditingController();
@@ -23,6 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Color(0xFFFFA500),
+          automaticallyImplyLeading: false,
           title: Text('Register Page'),
         ),
         body: SingleChildScrollView(
@@ -106,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 SizedBox(height: size.height * 0.02),
                 TextButton(
                   onPressed: () {
-                    // Login logic
+                    _loginButton(context);
                   },
                   child: Text(
                     'Already have an account?',
@@ -119,11 +126,53 @@ class _RegisterPageState extends State<RegisterPage> {
         ));
   }
 
-  void _registerPressed(BuildContext context) {
+  void _registerPressed(BuildContext context) async {
     String fullName = _fullNameController.text.trim();
     String phoneNumber = _phoneNumberController.text.trim();
     String address = _addressController.text.trim();
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
+
+    try {
+      final UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      /*User? user = _auth.currentUser;
+      await FirebaseFirestore.instance.collection('users').doc(user?.uid).set({
+        'address': address,
+        'fullname': fullName,
+        'phonenumber': phoneNumber
+      }, SetOptions(merge: true));
+      */
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text('Account has been created'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Exit'),
+              ),
+            ],
+          );
+        },
+      );
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => LoginPage()));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    }
+  }
+
+  void _loginButton(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => LoginPage()));
   }
 }

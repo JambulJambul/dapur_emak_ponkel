@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login_page.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);
@@ -6,6 +8,8 @@ class ForgotPassword extends StatefulWidget {
   @override
   State<ForgotPassword> createState() => _ForgotPasswordState();
 }
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class _ForgotPasswordState extends State<ForgotPassword> {
   final TextEditingController _emailController = TextEditingController();
@@ -18,6 +22,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Color(0xFFFFA500),
+          automaticallyImplyLeading: false,
           title: Text('Forgot Password'),
         ),
         body: SingleChildScrollView(
@@ -46,24 +51,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         width: textFieldWidth,
                         child: ElevatedButton(
                           onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text("Password Reset"),
-                                  content: Text(
-                                      "An email has been sent to your inbox with instructions to reset your password."),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text("OK"),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
+                            _forgotPasswordPressed(context);
                           },
                           child: Text('Submit'),
                           style: ElevatedButton.styleFrom(
@@ -77,7 +65,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       SizedBox(height: size.height * 0.02),
                       TextButton(
                         onPressed: () {
-                          // Login logic
+                          _loginButton(context);
                         },
                         child: Text(
                           'Already have an account?',
@@ -87,7 +75,44 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     ]))));
   }
 
-  void _forgotPasswordPressed(BuildContext context) {
+  void _forgotPasswordPressed(BuildContext context) async {
     String email = _emailController.text.trim();
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text('Password reset email has been sent'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Exit'),
+              ),
+            ],
+          );
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text('Email not found'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Exit'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _loginButton(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => LoginPage()));
   }
 }

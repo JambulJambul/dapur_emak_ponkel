@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'view_menu.dart';
+import 'view_menu.dart';
+import 'package:flutter/services.dart';
+import 'order_history_page.dart';
+import 'edit_profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,52 +20,87 @@ class _HomePageState extends State<HomePage> {
     final double itemHeight = size.height * 0.2;
     final double itemPadding = size.width * 0.1;
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFFFFA500),
-        title: Text('Homepage'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: size.width * 0.05,
-            vertical: size.height * 0.05,
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? user = auth.currentUser;
+    String useremail = "not logged in";
+    if (user != null) {
+      useremail = user.email!;
+    } else {}
+
+    return WillPopScope(
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Color(0xFFFFA500),
+            automaticallyImplyLeading: false,
+            title: Text(useremail),
           ),
-          child: Column(
-            children: [
-              SizedBox(
-                height: size.width * 0.5,
-                width: size.width * 0.5,
-                child: CircleAvatar(
-                  backgroundImage:
-                      AssetImage('assets/images/attachment_121740866.png'),
-                ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: size.width * 0.05,
+                vertical: size.height * 0.05,
               ),
-              SizedBox(height: size.height * 0.05),
-              GridView.count(
-                crossAxisCount: 2,
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+              child: Column(
                 children: [
-                  _buildGridItem(
-                      context, 'Menu', 'assets/images/chef-hat-64.png'),
-                  _buildGridItem(context, 'Order Process',
-                      'assets/images/chef-hat-64.png'),
-                  _buildGridItem(context, 'Order History',
-                      'assets/images/chef-hat-64.png'),
-                  _buildGridItem(
-                      context, 'Edit Profile', 'assets/images/chef-hat-64.png'),
+                  SizedBox(
+                    height: size.width * 0.5,
+                    width: size.width * 0.5,
+                    child: CircleAvatar(
+                      backgroundImage:
+                          AssetImage('assets/images/attachment_121740866.png'),
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.05),
+                  GridView.count(
+                    crossAxisCount: 2,
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    children: [
+                      _buildGridItem(context, 'Menu',
+                          'assets/images/chef-hat-64.png', ViewMenu()),
+                      _buildGridItem(context, 'Order Process',
+                          'assets/images/chef-hat-64.png', OrderHistoryPage()),
+                      _buildGridItem(context, 'Order History',
+                          'assets/images/chef-hat-64.png', OrderHistoryPage()),
+                      _buildGridItem(context, 'Edit Profile',
+                          'assets/images/chef-hat-64.png', EditProfilePage()),
+                    ],
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
-    );
+        onWillPop: () async {
+          // Show a confirmation dialog
+          bool shouldClose = await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Confirm'),
+                content: Text('Are you sure you want to exit?'),
+                actions: <Widget>[
+                  ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text('No'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => SystemNavigator.pop(),
+                    child: Text('Yes'),
+                  ),
+                ],
+              );
+            },
+          );
+
+          // Return the result of the confirmation dialog
+          return shouldClose;
+        });
   }
 
-  Widget _buildGridItem(BuildContext context, String label, String imgUrl) {
+  Widget _buildGridItem(
+      BuildContext context, String label, String imgUrl, constructor) {
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: ElevatedButton(
@@ -71,9 +112,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(label),
-          ));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => constructor,
+            ),
+          );
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
