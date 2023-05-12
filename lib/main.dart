@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: user == null ? LoginPage() : HomePage(),
+      home: user == null ? const LoginPage() : const HomePage(),
     );
   }
 }

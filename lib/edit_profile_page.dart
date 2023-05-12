@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -9,26 +10,62 @@ class EditProfilePage extends StatefulWidget {
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
+FirebaseFirestore _firestore = FirebaseFirestore.instance;
+FirebaseAuth auth = FirebaseAuth.instance;
+User? user = auth.currentUser;
+
 class _EditProfilePageState extends State<EditProfilePage> {
-  final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  TextEditingController _fullNameController = TextEditingController();
+  TextEditingController _phoneNumberController = TextEditingController();
+  TextEditingController _addressController = TextEditingController();
+
+  String _existingFullName = "Default Name";
+  String _existingAddress = "Default Address";
+  String _existingPhoneNumber = "Default Number";
 
   @override
+  void initState() {
+    super.initState();
+    getUserData();
+  }
+
+  Future<void> getUserData() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? user = auth.currentUser;
+
+    var db = FirebaseFirestore.instance;
+    final docRef = db.collection("users").doc(user?.uid);
+
+    try {
+      final documentSnapshot = await docRef.get();
+      if (documentSnapshot.exists) {
+        Map<String, dynamic>? data = documentSnapshot.data();
+        _existingFullName = data!['fullname'];
+        _existingAddress = data['address'];
+        _existingPhoneNumber = data['phonenumber'];
+        setState(() {});
+      }
+    } catch (e) {
+      print('Error getting document: $e');
+    }
+  }
+
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final formPadding = size.width * 0.1;
     final textFieldWidth = size.width * 0.8;
 
+    _fullNameController = TextEditingController(text: _existingFullName);
+    _phoneNumberController = TextEditingController(text: _existingPhoneNumber);
+    _addressController = TextEditingController(text: _existingAddress);
+
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xFFFFA500),
-          title: Text('Edit Profile'),
+          backgroundColor: const Color(0xFFFFA500),
+          title: const Text('Edit Profile'),
         ),
         body: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           child: Padding(
             padding: EdgeInsets.only(
               top: formPadding,
@@ -41,52 +78,53 @@ class _EditProfilePageState extends State<EditProfilePage> {
               children: [
                 SizedBox(
                   width: textFieldWidth,
-                  child: TextField(
-                    controller: _fullNameController,
-                    decoration: InputDecoration(
-                      labelText: 'Full Name',
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Full Name",
+                      ),
+                      TextField(
+                        controller: _fullNameController,
+                        decoration:
+                            InputDecoration(hintText: _existingFullName),
+                      )
+                    ],
                   ),
                 ),
                 SizedBox(height: size.height * 0.02),
                 SizedBox(
                   width: textFieldWidth,
-                  child: TextField(
-                    controller: _phoneNumberController,
-                    decoration: InputDecoration(
-                      labelText: 'Phone Number',
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Phone Number",
+                      ),
+                      TextField(
+                        controller: _phoneNumberController,
+                        decoration:
+                            InputDecoration(hintText: _existingPhoneNumber),
+                      )
+                    ],
                   ),
                 ),
                 SizedBox(height: size.height * 0.02),
                 SizedBox(
                   width: textFieldWidth,
-                  child: TextField(
-                    controller: _addressController,
-                    decoration: InputDecoration(
-                      labelText: 'Address',
-                    ),
-                  ),
-                ),
-                SizedBox(height: size.height * 0.02),
-                SizedBox(
-                  width: textFieldWidth,
-                  child: TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                    ),
-                  ),
-                ),
-                SizedBox(height: size.height * 0.02),
-                SizedBox(
-                  width: textFieldWidth,
-                  child: TextField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Address",
+                      ),
+                      TextField(
+                        controller: _addressController,
+                        decoration: InputDecoration(
+                          hintText: _existingAddress,
+                        ),
+                      )
+                    ],
                   ),
                 ),
                 SizedBox(height: size.height * 0.05),
@@ -96,9 +134,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     onPressed: () {
                       _editPressed(context);
                     },
-                    child: Text('Edit Profile'),
+                    child: const Text('Edit Profile'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFFA500),
+                      backgroundColor: const Color(0xFFFFA500),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -112,9 +150,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     onPressed: () {
                       _logoutPressed(context);
                     },
-                    child: Text('Logout'),
+                    child: const Text('Logout'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 255, 0, 0),
+                      backgroundColor: const Color.fromARGB(255, 255, 0, 0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -127,12 +165,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ));
   }
 
-  void _editPressed(BuildContext context) {
+  void _editPressed(BuildContext context) async {
     String fullName = _fullNameController.text.trim();
     String phoneNumber = _phoneNumberController.text.trim();
     String address = _addressController.text.trim();
-    String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
+
+    try {
+      await _firestore.collection("users").doc(user?.uid).set({
+        'address': address,
+        'fullname': fullName,
+        'phonenumber': phoneNumber
+      });
+    } catch (e) {
+      if (e is FirebaseException) {
+        print('Firebase error: ${e.message}');
+      } else {
+        print('Error: $e');
+      }
+    }
   }
 
   void _logoutPressed(BuildContext context) async {
@@ -140,7 +190,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     await _auth.signOut();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => LoginPage(),
+        builder: (context) => const LoginPage(),
       ),
     );
   }

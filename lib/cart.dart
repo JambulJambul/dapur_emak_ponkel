@@ -21,12 +21,12 @@ class CartItem {
 }
 
 class _CartPageState extends State<CartPage> {
-  List<CartItem> _cartItems = [
+  final List<CartItem> _cartItems = [
     CartItem(name: 'Item 1', quantity: 2, price: 10.0),
     CartItem(name: 'Item 2', quantity: 1, price: 15.0),
     CartItem(name: 'Item 3', quantity: 3, price: 7.5),
   ];
-  String _selectedPaymentOption = 'Bank Transfer';
+  final String _selectedPaymentOption = 'Bank Transfer';
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -34,8 +34,8 @@ class _CartPageState extends State<CartPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cart'),
-        backgroundColor: Color(0xFFFFA500),
+        title: const Text('Cart'),
+        backgroundColor: const Color(0xFFFFA500),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(
@@ -47,13 +47,13 @@ class _CartPageState extends State<CartPage> {
           children: [
             Text(
               'Order Date: ${DateFormat.yMMMMd().format(DateTime.now())}',
-              style: TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 20),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ListView.separated(
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
-              separatorBuilder: (context, index) => Divider(),
+              separatorBuilder: (context, index) => const Divider(),
               itemCount: _cartItems.length,
               itemBuilder: (context, index) {
                 final item = _cartItems[index];
@@ -65,13 +65,13 @@ class _CartPageState extends State<CartPage> {
                     Row(
                       children: [
                         Text('\$${item.price * item.quantity}'),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         SizedBox(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               IconButton(
-                                icon: Icon(Icons.remove),
+                                icon: const Icon(Icons.remove),
                                 onPressed: () {
                                   setState(() {
                                     if (item.quantity > 1) {
@@ -82,7 +82,7 @@ class _CartPageState extends State<CartPage> {
                               ),
                               Text('${item.quantity}'),
                               IconButton(
-                                icon: Icon(Icons.add),
+                                icon: const Icon(Icons.add),
                                 onPressed: () {
                                   setState(() {
                                     item.quantity++;
@@ -106,8 +106,8 @@ class _CartPageState extends State<CartPage> {
                   (context);
                 },
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFFA500)),
-                child: Text('Proceed to Payment'),
+                    backgroundColor: const Color(0xFFFFA500)),
+                child: const Text('Proceed to Payment'),
               ),
             ),
           ],

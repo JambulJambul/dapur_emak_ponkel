@@ -14,8 +14,8 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFFFA500),
-        title: Text('Order History'),
+        backgroundColor: const Color(0xFFFFA500),
+        title: const Text('Order History'),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(
@@ -49,7 +49,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       date,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                       ),
@@ -79,7 +79,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
               fit: BoxFit.cover,
             ),
           ),
-          SizedBox(width: 8.0),
+          const SizedBox(width: 8.0),
         ],
       ),
     );

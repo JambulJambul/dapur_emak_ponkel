@@ -25,12 +25,12 @@ class _LoginPageState extends State<LoginPage> {
     return WillPopScope(
         child: Scaffold(
           appBar: AppBar(
-            backgroundColor: Color(0xFFFFA500),
+            backgroundColor: const Color(0xFFFFA500),
             automaticallyImplyLeading: false,
-            title: Text('Login Page'),
+            title: const Text('Login Page'),
           ),
           body: SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             child: Padding(
               padding: EdgeInsets.only(
                 top: formPadding,
@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(height: size.height * 0.05),
-                  SizedBox(
+                  const SizedBox(
                     height: 100,
                     width: 100,
                     child: CircleAvatar(
@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
                     width: textFieldWidth,
                     child: TextField(
                       controller: _usernameController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Username',
                       ),
                     ),
@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextField(
                       controller: _passwordController,
                       obscureText: true,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Password',
                       ),
                     ),
@@ -78,8 +78,8 @@ class _LoginPageState extends State<LoginPage> {
                         _loginPressed(context);
                       },
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFFFA500)),
-                      child: Text('Login'),
+                          backgroundColor: const Color(0xFFFFA500)),
+                      child: const Text('Login'),
                     ),
                   ),
                   SizedBox(height: size.height * 0.02),
@@ -89,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(10),
                           color: Colors.red,
                         ),
-                        child: Padding(
+                        child: const Padding(
                           padding: EdgeInsets.all(
                             8,
                           ),
@@ -130,16 +130,16 @@ class _LoginPageState extends State<LoginPage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('Confirm'),
-                content: Text('Are you sure you want to exit?'),
+                title: const Text('Confirm'),
+                content: const Text('Are you sure you want to exit?'),
                 actions: <Widget>[
                   ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(false),
-                    child: Text('No'),
+                    child: const Text('No'),
                   ),
                   ElevatedButton(
                     onPressed: () => SystemNavigator.pop(),
-                    child: Text('Yes'),
+                    child: const Text('Yes'),
                   ),
                 ],
               );
@@ -155,11 +155,11 @@ class _LoginPageState extends State<LoginPage> {
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
     try {
-      final credential = await FirebaseAuth.instance
+      await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: username, password: password);
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => HomePage(),
+          builder: (context) => const HomePage(),
         ),
       );
     } on FirebaseAuthException catch (e) {
@@ -174,11 +174,11 @@ class _LoginPageState extends State<LoginPage> {
 
   void _forgotPasswordButton(BuildContext context) {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => ForgotPassword()));
+        .push(MaterialPageRoute(builder: (context) => const ForgotPassword()));
   }
 
   void _registerButton(BuildContext context) {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => RegisterPage()));
+        .push(MaterialPageRoute(builder: (context) => const RegisterPage()));
   }
 }

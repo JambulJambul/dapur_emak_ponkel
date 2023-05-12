@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'view_menu.dart';
-import 'view_menu.dart';
 import 'package:flutter/services.dart';
 import 'order_history_page.dart';
 import 'edit_profile_page.dart';
@@ -25,12 +24,12 @@ class _HomePageState extends State<HomePage> {
     String useremail = "not logged in";
     if (user != null) {
       useremail = user.email!;
-    } else {}
+    }
 
     return WillPopScope(
         child: Scaffold(
           appBar: AppBar(
-            backgroundColor: Color(0xFFFFA500),
+            backgroundColor: const Color(0xFFFFA500),
             automaticallyImplyLeading: false,
             title: Text(useremail),
           ),
@@ -45,7 +44,7 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(
                     height: size.width * 0.5,
                     width: size.width * 0.5,
-                    child: CircleAvatar(
+                    child: const CircleAvatar(
                       backgroundImage:
                           AssetImage('assets/images/attachment_121740866.png'),
                     ),
@@ -55,16 +54,25 @@ class _HomePageState extends State<HomePage> {
                     crossAxisCount: 2,
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     children: [
                       _buildGridItem(context, 'Menu',
-                          'assets/images/chef-hat-64.png', ViewMenu()),
-                      _buildGridItem(context, 'Order Process',
-                          'assets/images/chef-hat-64.png', OrderHistoryPage()),
-                      _buildGridItem(context, 'Order History',
-                          'assets/images/chef-hat-64.png', OrderHistoryPage()),
-                      _buildGridItem(context, 'Edit Profile',
-                          'assets/images/chef-hat-64.png', EditProfilePage()),
+                          'assets/images/chef-hat-64.png', const ViewMenu()),
+                      _buildGridItem(
+                          context,
+                          'Order Process',
+                          'assets/images/chef-hat-64.png',
+                          const OrderHistoryPage()),
+                      _buildGridItem(
+                          context,
+                          'Order History',
+                          'assets/images/chef-hat-64.png',
+                          const OrderHistoryPage()),
+                      _buildGridItem(
+                          context,
+                          'Edit Profile',
+                          'assets/images/chef-hat-64.png',
+                          const EditProfilePage()),
                     ],
                   ),
                 ],
@@ -78,16 +86,16 @@ class _HomePageState extends State<HomePage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('Confirm'),
-                content: Text('Are you sure you want to exit?'),
+                title: const Text('Confirm'),
+                content: const Text('Are you sure you want to exit?'),
                 actions: <Widget>[
                   ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(false),
-                    child: Text('No'),
+                    child: const Text('No'),
                   ),
                   ElevatedButton(
                     onPressed: () => SystemNavigator.pop(),
-                    child: Text('Yes'),
+                    child: const Text('Yes'),
                   ),
                 ],
               );
@@ -102,11 +110,11 @@ class _HomePageState extends State<HomePage> {
   Widget _buildGridItem(
       BuildContext context, String label, String imgUrl, constructor) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFFFFA500),
-          minimumSize: Size(0, 80),
+          backgroundColor: const Color(0xFFFFA500),
+          minimumSize: const Size(0, 80),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
           ),
@@ -123,12 +131,12 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image(image: AssetImage(imgUrl)),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Text(
               label,
-              style: TextStyle(color: Colors.black, fontSize: 16),
+              style: const TextStyle(color: Colors.black, fontSize: 16),
             )
           ],
         ),

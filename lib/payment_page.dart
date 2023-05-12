@@ -18,27 +18,28 @@ class _PaymentPageState extends State<PaymentPage> {
   Widget _buildBankTransferWidget() {
     return Column(
       children: [
-        Text('Please transfer the payment to the following account:'),
-        SizedBox(height: 10),
-        Text('Bank Name: CIMBD Bank'),
-        SizedBox(height: 5),
-        Text('Account Name: John Doe'),
-        SizedBox(height: 5),
-        Text('Account Number: 1231212412'),
-        SizedBox(height: 20),
-        Text('Upload Payment Proof'),
-        SizedBox(height: 10),
+        const Text('Please transfer the payment to the following account:'),
+        const SizedBox(height: 10),
+        const Text('Bank Name: CIMBD Bank'),
+        const SizedBox(height: 5),
+        const Text('Account Name: John Doe'),
+        const SizedBox(height: 5),
+        const Text('Account Number: 1231212412'),
+        const SizedBox(height: 20),
+        const Text('Upload Payment Proof'),
+        const SizedBox(height: 10),
         Container(
           width: 150,
           height: 150,
           color: Colors.grey[200],
-          child: Icon(Icons.upload_file),
+          child: const Icon(Icons.upload_file),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFFA500)),
+          style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFFA500)),
           onPressed: () {},
-          child: Text('Submit'),
+          child: const Text('Submit'),
         ),
       ],
     );
@@ -48,8 +49,8 @@ class _PaymentPageState extends State<PaymentPage> {
     String? _selectedOption;
     return Column(
       children: [
-        Text('Select Payment Method'),
-        SizedBox(height: 10),
+        const Text('Select Payment Method'),
+        const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -94,11 +95,12 @@ class _PaymentPageState extends State<PaymentPage> {
             ),
           ],
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFFA500)),
+          style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFFA500)),
           onPressed: () {},
-          child: Text('Submit'),
+          child: const Text('Submit'),
         ),
       ],
     );
@@ -109,8 +111,8 @@ class _PaymentPageState extends State<PaymentPage> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Payment'),
-        backgroundColor: Color(0xFFFFA500),
+        title: const Text('Payment'),
+        backgroundColor: const Color(0xFFFFA500),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(
@@ -120,8 +122,8 @@ class _PaymentPageState extends State<PaymentPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Select Payment Option'),
-            SizedBox(height: 10),
+            const Text('Select Payment Option'),
+            const SizedBox(height: 10),
             DropdownButton<String>(
               value: _selectedPaymentOption,
               onChanged: (value) {
@@ -138,7 +140,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   )
                   .toList(),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             if (_selectedPaymentOption == 'Bank Transfer')
               _buildBankTransferWidget()
             else if (_selectedPaymentOption == 'E-Wallet')

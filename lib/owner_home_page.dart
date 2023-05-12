@@ -17,8 +17,8 @@ class _OwnerHomePageState extends State<OwnerHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFFFA500),
-        title: Text('Owner Homepage'),
+        backgroundColor: const Color(0xFFFFA500),
+        title: const Text('Owner Homepage'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -31,7 +31,7 @@ class _OwnerHomePageState extends State<OwnerHomePage> {
               SizedBox(
                 height: size.width * 0.5,
                 width: size.width * 0.5,
-                child: CircleAvatar(
+                child: const CircleAvatar(
                   backgroundImage:
                       AssetImage('assets/images/attachment_121740866.png'),
                 ),
@@ -41,7 +41,7 @@ class _OwnerHomePageState extends State<OwnerHomePage> {
                 crossAxisCount: 2,
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _buildGridItem(
                       context, 'Manage Menu', 'assets/images/chef-hat-64.png'),
@@ -60,11 +60,11 @@ class _OwnerHomePageState extends State<OwnerHomePage> {
 
   Widget _buildGridItem(BuildContext context, String label, String imgUrl) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFFFFA500),
-          minimumSize: Size(0, 80),
+          backgroundColor: const Color(0xFFFFA500),
+          minimumSize: const Size(0, 80),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
           ),
@@ -79,12 +79,12 @@ class _OwnerHomePageState extends State<OwnerHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image(image: AssetImage(imgUrl)),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Text(
               label,
-              style: TextStyle(color: Colors.black, fontSize: 16),
+              style: const TextStyle(color: Colors.black, fontSize: 16),
             )
           ],
         ),

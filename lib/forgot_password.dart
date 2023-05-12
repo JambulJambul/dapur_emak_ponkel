@@ -21,12 +21,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xFFFFA500),
+          backgroundColor: const Color(0xFFFFA500),
           automaticallyImplyLeading: false,
-          title: Text('Forgot Password'),
+          title: const Text('Forgot Password'),
         ),
         body: SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             child: Padding(
                 padding: EdgeInsets.only(
                   top: formPadding,
@@ -41,7 +41,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         width: textFieldWidth,
                         child: TextField(
                           controller: _emailController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Email',
                           ),
                         ),
@@ -53,9 +53,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           onPressed: () {
                             _forgotPasswordPressed(context);
                           },
-                          child: Text('Submit'),
+                          child: const Text('Submit'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFFFA500),
+                            backgroundColor: const Color(0xFFFFA500),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -83,11 +83,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: Text('Password reset email has been sent'),
+            content: const Text('Password reset email has been sent'),
             actions: <Widget>[
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('Exit'),
+                child: const Text('Exit'),
               ),
             ],
           );
@@ -98,11 +98,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: Text('Email not found'),
+            content: const Text('Email not found'),
             actions: <Widget>[
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('Exit'),
+                child: const Text('Exit'),
               ),
             ],
           );
@@ -113,6 +113,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   void _loginButton(BuildContext context) {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => LoginPage()));
+        .push(MaterialPageRoute(builder: (context) => const LoginPage()));
   }
 }

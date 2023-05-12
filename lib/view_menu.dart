@@ -22,7 +22,7 @@ class _ViewMenuState extends State<ViewMenu> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -32,22 +32,23 @@ class _ViewMenuState extends State<ViewMenu> {
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Text(
                   label,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   itemDesc,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('Close'),
+                  child: const Text('Close'),
                 ),
               ],
             ),
@@ -60,7 +61,7 @@ class _ViewMenuState extends State<ViewMenu> {
   Widget _buildCard(
       BuildContext context, String label, String imgUrl, String itemDesc) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () => _showCardDialog(context, label, imgUrl, itemDesc),
         child: Card(
@@ -73,7 +74,7 @@ class _ViewMenuState extends State<ViewMenu> {
               Expanded(
                 flex: 1,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16.0),
                     bottomLeft: Radius.circular(16.0),
                   ),
@@ -90,7 +91,7 @@ class _ViewMenuState extends State<ViewMenu> {
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
                     label,
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),
@@ -110,8 +111,8 @@ class _ViewMenuState extends State<ViewMenu> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Menu'),
-        backgroundColor: Color(0xFFFFA500),
+        title: const Text('Menu'),
+        backgroundColor: const Color(0xFFFFA500),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(
@@ -127,7 +128,7 @@ class _ViewMenuState extends State<ViewMenu> {
               focusedDay: _focusedDay,
               calendarFormat: _calendarFormat,
               availableCalendarFormats: const {CalendarFormat.week: 'Week'},
-              headerStyle: HeaderStyle(titleCentered: true),
+              headerStyle: const HeaderStyle(titleCentered: true),
               selectedDayPredicate: (day) {
                 return isSameDay(_selectedDay, day);
               },
@@ -142,7 +143,7 @@ class _ViewMenuState extends State<ViewMenu> {
                   _calendarFormat = format;
                 });
               },
-              calendarStyle: CalendarStyle(
+              calendarStyle: const CalendarStyle(
                 selectedDecoration: BoxDecoration(
                   color: Colors.orange,
                   shape: BoxShape.circle,
@@ -153,7 +154,7 @@ class _ViewMenuState extends State<ViewMenu> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildCard(
               context,
               'Nasi Goreng',
@@ -180,8 +181,8 @@ class _ViewMenuState extends State<ViewMenu> {
                   (context);
                 },
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFFA500)),
-                child: Text('Add To Cart'),
+                    backgroundColor: const Color(0xFFFFA500)),
+                child: const Text('Add To Cart'),
               ),
             ),
           ],

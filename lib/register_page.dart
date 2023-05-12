@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
+import 'home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -28,12 +29,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xFFFFA500),
+          backgroundColor: const Color(0xFFFFA500),
           automaticallyImplyLeading: false,
-          title: Text('Register Page'),
+          title: const Text('Register Page'),
         ),
         body: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           child: Padding(
             padding: EdgeInsets.only(
               top: formPadding,
@@ -48,7 +49,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   width: textFieldWidth,
                   child: TextField(
                     controller: _fullNameController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Full Name',
                     ),
                   ),
@@ -58,7 +59,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   width: textFieldWidth,
                   child: TextField(
                     controller: _phoneNumberController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Phone Number',
                     ),
                   ),
@@ -68,7 +69,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   width: textFieldWidth,
                   child: TextField(
                     controller: _addressController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Address',
                     ),
                   ),
@@ -78,7 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   width: textFieldWidth,
                   child: TextField(
                     controller: _emailController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Email',
                     ),
                   ),
@@ -89,7 +90,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: TextField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Password',
                     ),
                   ),
@@ -101,9 +102,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     onPressed: () {
                       _registerPressed(context);
                     },
-                    child: Text('Register'),
+                    child: const Text('Register'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFFA500),
+                      backgroundColor: const Color(0xFFFFA500),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -134,45 +135,59 @@ class _RegisterPageState extends State<RegisterPage> {
     String password = _passwordController.text.trim();
 
     try {
-      final UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
+      final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      /*User? user = _auth.currentUser;
-      await FirebaseFirestore.instance.collection('users').doc(user?.uid).set({
-        'address': address,
-        'fullname': fullName,
-        'phonenumber': phoneNumber
-      }, SetOptions(merge: true));
-      */
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      await _firestore.collection('users').doc(userCredential.user?.uid).set(
+        {
+          'address': address,
+          'fullname': fullName,
+          'phonenumber': phoneNumber,
+          'email': userCredential.user?.email,
+          'uid': userCredential.user?.uid
+        },
+      );
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: Text('Account has been created'),
+            content: const Text('Account has been created'),
             actions: <Widget>[
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Exit'),
+                onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const HomePage())),
+                child: const Text('Exit'),
               ),
             ],
           );
         },
       );
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => LoginPage()));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              content: const Text('Email address already used.'),
+              actions: <Widget>[
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Exit'),
+                ),
+              ],
+            );
+          },
+        );
       }
     }
   }
 
   void _loginButton(BuildContext context) {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => LoginPage()));
+        .push(MaterialPageRoute(builder: (context) => const LoginPage()));
   }
 }
