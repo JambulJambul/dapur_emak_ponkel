@@ -13,8 +13,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 class PaymentPage extends StatefulWidget {
   final List<CartItem> cartItems;
   final double totalPrice;
+  final DateTime deliveryDay;
   const PaymentPage(
-      {Key? key, required this.cartItems, required this.totalPrice})
+      {Key? key,
+      required this.cartItems,
+      required this.totalPrice,
+      required this.deliveryDay})
       : super(key: key);
 
   @override
@@ -58,7 +62,7 @@ class _PaymentPageState extends State<PaymentPage> {
         'paymentUrl': downloadUrl,
         'uid': user?.uid,
         'deliveryDate':
-            DateFormat.yMMMMd().format(_cartItems[0].deliveryDate).toString(),
+            DateFormat.yMMMMd().format(widget.deliveryDay).toString(),
         'cartItems': cartItemsData
       });
       showDialog(
@@ -73,13 +77,28 @@ class _PaymentPageState extends State<PaymentPage> {
                     builder: (context) => const HomePage(),
                   ),
                 ),
+                child: const Text('Ok'),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: const Text('Payment error, please try again.'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
                 child: const Text('Exit'),
               ),
             ],
           );
         },
       );
-    } catch (e) {}
+    }
   }
 
   Widget _buildBankTransferWidget() {

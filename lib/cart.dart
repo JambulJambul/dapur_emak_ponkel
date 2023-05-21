@@ -3,8 +3,10 @@ import 'package:intl/intl.dart';
 import 'payment_page.dart';
 
 class CartPage extends StatefulWidget {
-  List<CartItem> cartItems = [];
-  CartPage({Key? key, required this.cartItems}) : super(key: key);
+  final List<CartItem> cartItems;
+  final DateTime deliveryDay;
+  CartPage({Key? key, required this.cartItems, required this.deliveryDay})
+      : super(key: key);
 
   @override
   State<CartPage> createState() => _CartPageState();
@@ -16,14 +18,13 @@ class CartItem {
   final String itemDesc;
   int quantity;
   var price;
-  DateTime deliveryDate;
-  CartItem(
-      {required this.imgUrl,
-      required this.itemDesc,
-      required this.label,
-      required this.quantity,
-      required this.price,
-      required this.deliveryDate});
+  CartItem({
+    required this.imgUrl,
+    required this.itemDesc,
+    required this.label,
+    required this.quantity,
+    required this.price,
+  });
   Map<String, dynamic> toMap() {
     return {
       'name': label,
@@ -148,7 +149,7 @@ class _CartPageState extends State<CartPage> {
             ),
             SizedBox(height: size.height * 0.05),
             Text(
-                'Order Date: ${DateFormat.yMMMMd().format(_cartItems[0].deliveryDate)}'),
+                'Order Date: ${DateFormat.yMMMMd().format(widget.deliveryDay)}'),
             SizedBox(height: size.height * 0.02),
             Text('Total Price: RM${_calculateTotalPrice()}'),
             SizedBox(height: size.height * 0.05),
@@ -159,8 +160,10 @@ class _CartPageState extends State<CartPage> {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => PaymentPage(
-                          cartItems: _cartItems,
-                          totalPrice: _calculateTotalPrice()),
+                        cartItems: _cartItems,
+                        totalPrice: _calculateTotalPrice(),
+                        deliveryDay: widget.deliveryDay,
+                      ),
                     ),
                   );
                 },

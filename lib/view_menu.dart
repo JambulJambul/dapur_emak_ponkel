@@ -188,7 +188,6 @@ class _ViewMenuState extends State<ViewMenu> {
                               imgUrl: imgUrl,
                               itemDesc: itemDesc,
                               quantity: 1,
-                              deliveryDate: selectedDate,
                               price: price);
                         }).toList();
                         return ListView.builder(
@@ -223,6 +222,7 @@ class _ViewMenuState extends State<ViewMenu> {
   }
 
   void _checkdate(BuildContext context, DateTime selectedDay) async {
+    DateTime selectedDate = selectedDay;
     DateTime currentDate = DateTime.now();
     DateTime currentDateFormatted =
         DateTime(currentDate.year, currentDate.month, currentDate.day);
@@ -248,7 +248,10 @@ class _ViewMenuState extends State<ViewMenu> {
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => CartPage(cartItems: cartItems),
+          builder: (context) => CartPage(
+            cartItems: cartItems,
+            deliveryDay: selectedDate,
+          ),
         ),
       );
     }
