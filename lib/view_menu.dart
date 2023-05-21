@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:intl/intl.dart';
+import 'cart.dart';
 
 class ViewMenu extends StatefulWidget {
   const ViewMenu({Key? key}) : super(key: key);
@@ -11,10 +15,13 @@ class ViewMenu extends StatefulWidget {
 class _ViewMenuState extends State<ViewMenu> {
   CalendarFormat _calendarFormat = CalendarFormat.week;
   DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  DateTime? _selectedDay = DateTime.now();
+  List<CartItem> cartItems = [];
 
-  void _showCardDialog(
-      BuildContext context, String label, String imgUrl, String itemDesc) {
+  void _showCardDialog(BuildContext context, CartItem cartItem) {
+    String label = cartItem.label;
+    String imgUrl = cartItem.imgUrl;
+    String itemDesc = cartItem.itemDesc;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -26,7 +33,7 @@ class _ViewMenuState extends State<ViewMenu> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(
+                Image.network(
                   imgUrl,
                   height: 200,
                   width: double.infinity,
@@ -58,12 +65,14 @@ class _ViewMenuState extends State<ViewMenu> {
     );
   }
 
-  Widget _buildCard(
-      BuildContext context, String label, String imgUrl, String itemDesc) {
+  Widget _buildCard(BuildContext context, CartItem cartItem) {
+    String label = cartItem.label;
+    String imgUrl = cartItem.imgUrl;
+    String itemDesc = cartItem.itemDesc;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
-        onTap: () => _showCardDialog(context, label, imgUrl, itemDesc),
+        onTap: () => _showCardDialog(context, cartItem),
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
@@ -78,10 +87,11 @@ class _ViewMenuState extends State<ViewMenu> {
                     topLeft: Radius.circular(16.0),
                     bottomLeft: Radius.circular(16.0),
                   ),
-                  child: Image(
-                    fit: BoxFit.fill,
+                  child: Image.network(
+                    imgUrl,
+                    fit: BoxFit.cover,
                     width: 64,
-                    image: AssetImage(imgUrl),
+                    height: 90,
                   ),
                 ),
               ),
@@ -108,6 +118,9 @@ class _ViewMenuState extends State<ViewMenu> {
     final double itemHeight = size.height * 0.6;
     final double itemWidth = size.width * 0.8;
     final double buttonWidth = size.width * 0.4;
+    DateTime selectedDate =
+        DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
+    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
 
     return Scaffold(
       appBar: AppBar(
@@ -137,6 +150,7 @@ class _ViewMenuState extends State<ViewMenu> {
                   _selectedDay = selectedDay;
                   _focusedDay = focusedDay;
                 });
+                const CircularProgressIndicator();
               },
               onFormatChanged: (format) {
                 setState(() {
@@ -155,30 +169,47 @@ class _ViewMenuState extends State<ViewMenu> {
               ),
             ),
             const SizedBox(height: 20),
-            _buildCard(
-              context,
-              'Nasi Goreng',
-              'assets/images/attachment_121740866.png',
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-            ),
-            _buildCard(
-              context,
-              'Rendang',
-              'assets/images/attachment_121740866.png',
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-            ),
-            _buildCard(
-              context,
-              'Maggie Goreng',
-              'assets/images/attachment_121740866.png',
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-            ),
+            Expanded(
+                child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('foodmenu')
+                        .where("menudatestring", isEqualTo: formattedDate)
+                        .snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasData) {
+                        cartItems = snapshot.data!.docs.map((menu) {
+                          String label = menu['menutitle'];
+                          String imgUrl = menu['imageurl'];
+                          String itemDesc = menu['menudesc'];
+                          var price = menu['price'];
+                          return CartItem(
+                              label: label,
+                              imgUrl: imgUrl,
+                              itemDesc: itemDesc,
+                              quantity: 1,
+                              deliveryDate: selectedDate,
+                              price: price);
+                        }).toList();
+                        return ListView.builder(
+                          itemCount: cartItems.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            CartItem cartItem = cartItems[index];
+                            return _buildCard(context, cartItem);
+                          },
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
+                      return const CircularProgressIndicator();
+                    })),
             SizedBox(height: size.height * 0.05),
             SizedBox(
               width: buttonWidth,
               child: ElevatedButton(
                 onPressed: () {
-                  (context);
+                  _checkdate(context, _selectedDay!);
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFA500)),
@@ -189,5 +220,37 @@ class _ViewMenuState extends State<ViewMenu> {
         ),
       ),
     );
+  }
+
+  void _checkdate(BuildContext context, DateTime selectedDay) async {
+    DateTime currentDate = DateTime.now();
+    DateTime currentDateFormatted =
+        DateTime(currentDate.year, currentDate.month, currentDate.day);
+    if (selectedDay.isBefore(currentDate)) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Invalid Date'),
+            content:
+                const Text('Order must be made 1 day before the delivery date'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CartPage(cartItems: cartItems),
+        ),
+      );
+    }
   }
 }

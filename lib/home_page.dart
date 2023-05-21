@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
           appBar: AppBar(
             backgroundColor: const Color(0xFFFFA500),
             automaticallyImplyLeading: false,
-            title: Text(useremail),
+            title: Text("Homepage"),
           ),
           body: SingleChildScrollView(
             child: Padding(
@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
                           const OrderHistoryPage()),
                       _buildGridItem(
                           context,
-                          'Edit Profile',
+                          'My Profile',
                           'assets/images/chef-hat-64.png',
                           const EditProfilePage()),
                     ],

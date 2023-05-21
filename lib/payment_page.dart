@@ -1,23 +1,95 @@
+import 'dart:io';
+import 'home_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dapur_emak_ponkel/cart.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as Path;
+import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PaymentPage extends StatefulWidget {
-  const PaymentPage({Key? key}) : super(key: key);
+  final List<CartItem> cartItems;
+  final double totalPrice;
+  const PaymentPage(
+      {Key? key, required this.cartItems, required this.totalPrice})
+      : super(key: key);
 
   @override
   State<PaymentPage> createState() => _PaymentPageState();
 }
 
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+List<CartItem> _cartItems = [];
+
 class _PaymentPageState extends State<PaymentPage> {
   String _selectedPaymentOption = 'Bank Transfer';
+  final firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
 
   final List<String> _paymentOptions = [
     'Bank Transfer',
     'E-Wallet',
   ];
 
+  Future<void> _uploadFileFirebase(File file) async {
+    try {
+      User? user = _auth.currentUser;
+      _cartItems = widget.cartItems;
+      String fileName = Path.basename(file.path);
+      Reference ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('payment/bank_transfer/$fileName');
+      UploadTask uploadTask = ref.putFile(file);
+
+      await uploadTask.whenComplete(() => null);
+
+      List<Map<String, dynamic>> cartItemsData = [];
+      for (var cartItem in _cartItems) {
+        cartItemsData.add(cartItem.toMap());
+      }
+
+      String downloadUrl = await ref.getDownloadURL();
+      await _firestore.collection('payment').add({
+        'status': "unverified",
+        'paymentUrl': downloadUrl,
+        'uid': user?.uid,
+        'deliveryDate':
+            DateFormat.yMMMMd().format(_cartItems[0].deliveryDate).toString(),
+        'cartItems': cartItemsData
+      });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: const Text('Payment has been uploaded'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const HomePage(),
+                  ),
+                ),
+                child: const Text('Exit'),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {}
+  }
+
   Widget _buildBankTransferWidget() {
     return Column(
       children: [
+        Text(
+          'Total Price: RM ${widget.totalPrice.toStringAsFixed(2)}',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
         const Text('Please transfer the payment to the following account:'),
         const SizedBox(height: 10),
         const Text('Bank Name: CIMBD Bank'),
@@ -27,19 +99,15 @@ class _PaymentPageState extends State<PaymentPage> {
         const Text('Account Number: 1231212412'),
         const SizedBox(height: 20),
         const Text('Upload Payment Proof'),
-        const SizedBox(height: 10),
-        Container(
-          width: 150,
-          height: 150,
-          color: Colors.grey[200],
-          child: const Icon(Icons.upload_file),
-        ),
         const SizedBox(height: 20),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFFA500)),
-          onPressed: () {},
-          child: const Text('Submit'),
+          onPressed: () async {
+            File? file = await _uploadFile();
+            _uploadFileFirebase(file!);
+          },
+          child: const Text('Upload Payment'),
         ),
       ],
     );
@@ -49,6 +117,11 @@ class _PaymentPageState extends State<PaymentPage> {
     String? _selectedOption;
     return Column(
       children: [
+        Text(
+          'Total Price: RM ${widget.totalPrice.toStringAsFixed(2)}',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
         const Text('Select Payment Method'),
         const SizedBox(height: 10),
         Row(
@@ -149,5 +222,19 @@ class _PaymentPageState extends State<PaymentPage> {
         ),
       ),
     );
+  }
+
+  Future<File?> _uploadFile() async {
+    File? selectedFile;
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      selectedFile = File(pickedFile.path);
+      return selectedFile;
+    } else {
+      print('Image picker canceled');
+    }
   }
 }
