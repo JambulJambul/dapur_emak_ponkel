@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'home_page.dart';
+import 'web_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dapur_emak_ponkel/cart.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -9,6 +12,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as Path;
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'api/api_base_helper.dart';
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentPage extends StatefulWidget {
   final List<CartItem> cartItems;
@@ -25,6 +31,7 @@ class PaymentPage extends StatefulWidget {
   State<PaymentPage> createState() => _PaymentPageState();
 }
 
+ApiBaseHelper api = ApiBaseHelper();
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 List<CartItem> _cartItems = [];
@@ -106,7 +113,7 @@ class _PaymentPageState extends State<PaymentPage> {
       children: [
         Text(
           'Total Price: RM ${widget.totalPrice.toStringAsFixed(2)}',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
         const Text('Please transfer the payment to the following account:'),
@@ -138,61 +145,61 @@ class _PaymentPageState extends State<PaymentPage> {
       children: [
         Text(
           'Total Price: RM ${widget.totalPrice.toStringAsFixed(2)}',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
         const Text('Select Payment Method'),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: RadioListTile(
-                value: 'Option 1',
-                groupValue: _selectedOption,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedOption = value as String?;
-                  });
-                },
-                title: Image.asset(
-                    'assets/images/toppng.com-gopay-logo-png-image-200x200.png',
-                    height: 30),
-                activeColor: Colors.orange,
-                toggleable: true,
-                selected: _selectedOption == 'Option 1',
-                controlAffinity: ListTileControlAffinity.platform,
-              ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () {
+            midtransPayment();
+          },
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.all(16.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
             ),
-          ],
+            backgroundColor: Colors.blue,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/images/midtrans-logo.png',
+                height: 30,
+                color: Colors.white,
+              ),
+            ],
+          ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: RadioListTile(
-                value: 'Option 2',
-                groupValue: _selectedOption,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedOption = value as String?;
-                  });
-                },
-                title: Image.asset('assets/images/PaypalLogo.png', height: 30),
-                activeColor: Colors.orange,
-                toggleable: true,
-                selected: _selectedOption == 'Option 2',
-                controlAffinity: ListTileControlAffinity.platform,
-              ),
+        const SizedBox(height: 8.0),
+        ElevatedButton(
+          onPressed: () {
+            // Button action
+          },
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.all(16.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
             ),
-          ],
+            backgroundColor: const Color.fromRGBO(255, 204, 0, 1),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/images/PaypalLogo.png',
+                height: 30,
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 20),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFFA500)),
           onPressed: () {},
-          child: const Text('Submit'),
+          child: const Text('Continue'),
         ),
       ],
     );
@@ -254,6 +261,24 @@ class _PaymentPageState extends State<PaymentPage> {
       return selectedFile;
     } else {
       print('Image picker canceled');
+    }
+  }
+
+  midtransPayment() async {
+    var orderId = DateTime.now().millisecondsSinceEpoch.toString();
+    Map data = {"orderId": orderId, "amount": widget.totalPrice};
+    var body = json.encode(data);
+    print('Request Body: $body');
+    final response = await api.post("http://10.0.2.2:3000/payment", body);
+    if (response is Map<String, dynamic>) {
+      String redirectUrl = response['redirectUrl'];
+      print('URL: $redirectUrl');
+      final Uri _url = Uri.parse(redirectUrl);
+      if (!await launchUrl(_url)) {
+        throw Exception('Could not launch $_url');
+      }
+    } else {
+      print('Invalid response format');
     }
   }
 }
