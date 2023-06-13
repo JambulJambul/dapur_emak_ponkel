@@ -50,132 +50,133 @@ class _CartPageState extends State<CartPage> {
     final double buttonWidth = size.width * 0.6;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cart'),
-        backgroundColor: const Color(0xFFFFA500),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: size.width * 0.1,
-          vertical: size.height * 0.05,
+        appBar: AppBar(
+          title: const Text('Cart'),
+          backgroundColor: const Color(0xFFFFA500),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            ListView.separated(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              separatorBuilder: (context, index) => const Divider(),
-              itemCount: _cartItems.length,
-              itemBuilder: (context, index) {
-                final item = _cartItems[index];
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: size.width * 0.1,
+              vertical: size.height * 0.05,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                ListView.separated(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  separatorBuilder: (context, index) => const Divider(),
+                  itemCount: _cartItems.length,
+                  itemBuilder: (context, index) {
+                    final item = _cartItems[index];
 
-                return Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: Image.network(
-                            item.imgUrl,
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(width: 16.0),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.label,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                ),
+                    return Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.network(
+                                item.imgUrl,
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
                               ),
-                              const SizedBox(height: 8.0),
-                              Text(
-                                'RM ${item.price * item.quantity}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(height: 8.0),
-                              Row(
+                            ),
+                            const SizedBox(width: 16.0),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.remove),
-                                    onPressed: () {
-                                      setState(() {
-                                        if (item.quantity > 1) {
-                                          item.quantity--;
-                                        }
-                                      });
-                                    },
-                                  ),
                                   Text(
-                                    '${item.quantity}',
+                                    item.label,
                                     style: const TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.add),
-                                    onPressed: () {
-                                      setState(() {
-                                        item.quantity++;
-                                      });
-                                    },
+                                  const SizedBox(height: 8.0),
+                                  Text(
+                                    'RM ${item.price * item.quantity}',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8.0),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.remove),
+                                        onPressed: () {
+                                          setState(() {
+                                            if (item.quantity > 1) {
+                                              item.quantity--;
+                                            }
+                                          });
+                                        },
+                                      ),
+                                      Text(
+                                        '${item.quantity}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.add),
+                                        onPressed: () {
+                                          setState(() {
+                                            item.quantity++;
+                                          });
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(height: size.height * 0.05),
+                Text(
+                    'Order Date: ${DateFormat.yMMMMd().format(widget.deliveryDay)}'),
+                SizedBox(height: size.height * 0.02),
+                Text('Total Price: RM${_calculateTotalPrice()}'),
+                SizedBox(height: size.height * 0.05),
+                SizedBox(
+                  width: buttonWidth,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => PaymentPage(
+                            cartItems: _cartItems,
+                            totalPrice: _calculateTotalPrice(),
+                            deliveryDay: widget.deliveryDay,
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFA500)),
+                    child: const Text('Proceed to Payment'),
                   ),
-                );
-              },
+                ),
+              ],
             ),
-            SizedBox(height: size.height * 0.05),
-            Text(
-                'Order Date: ${DateFormat.yMMMMd().format(widget.deliveryDay)}'),
-            SizedBox(height: size.height * 0.02),
-            Text('Total Price: RM${_calculateTotalPrice()}'),
-            SizedBox(height: size.height * 0.05),
-            SizedBox(
-              width: buttonWidth,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => PaymentPage(
-                        cartItems: _cartItems,
-                        totalPrice: _calculateTotalPrice(),
-                        deliveryDay: widget.deliveryDay,
-                      ),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFA500)),
-                child: const Text('Proceed to Payment'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   double _calculateTotalPrice() {

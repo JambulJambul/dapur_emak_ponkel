@@ -269,7 +269,8 @@ class _PaymentPageState extends State<PaymentPage> {
     Map data = {"orderId": orderId, "amount": widget.totalPrice};
     var body = json.encode(data);
     print('Request Body: $body');
-    final response = await api.post("http://10.0.2.2:3000/payment", body);
+    final response = await api.post(
+        "https://052a-113-210-103-189.ngrok-free.app/payment", body);
     if (response is Map<String, dynamic>) {
       String redirectUrl = response['redirectUrl'];
       print('URL: $redirectUrl');
@@ -277,8 +278,56 @@ class _PaymentPageState extends State<PaymentPage> {
       if (!await launchUrl(_url)) {
         throw Exception('Could not launch $_url');
       }
+      await checkPaymentStatus(orderId);
     } else {
       print('Invalid response format');
+    }
+  }
+
+  Future<void> checkPaymentStatus(String orderId) async {
+    bool paymentCompleted = false;
+
+    while (!paymentCompleted) {
+      try {
+        final response = await http.get(Uri.parse(
+            'https://052a-113-210-103-189.ngrok-free.app/payment/callback'));
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+          String responseOrderId = responseData['order_id'];
+
+          if (responseOrderId == orderId && responseOrderId != null) {
+            String status = responseData['status'];
+            // Perform actions based on the payment status and URL
+
+            // Set paymentCompleted to true to exit the loop
+            paymentCompleted = true;
+          } else {
+            // The response has a different orderId, wait and try again
+            await Future.delayed(Duration(
+                milliseconds: 500)); // Wait for 0.5 seconds before retrying
+          }
+        } else {
+          print(
+              'Failed to retrieve payment status. StatusCode: ${response.statusCode}');
+          // Handle the error condition
+
+          // Set paymentCompleted to true to exit the loop
+          paymentCompleted = true;
+        }
+      } catch (e) {
+        print('Error occurred during payment status retrieval: $e');
+        // Handle the error condition
+
+        // Set paymentCompleted to true to exit the loop
+        paymentCompleted = true;
+      }
+    }
+    if (paymentCompleted == true) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+      );
     }
   }
 }
