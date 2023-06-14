@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'inc/dynamic_link_handler.dart';
 import 'login_page.dart';
 import 'register_page.dart';
 import 'forgot_password.dart';
@@ -11,6 +12,7 @@ import 'cart.dart';
 import 'edit_profile_page.dart';
 import 'order_history_page.dart';
 import 'owner_home_page.dart';
+import 'package:go_router/go_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +23,71 @@ void main() async {
   runApp(MyApp(user: user));
 }
 
+final GoRouter _router = GoRouter(
+  routes: <RouteBase>[
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) {
+        if (user == null) {
+          return const LoginPage();
+        } else {
+          return const HomePage();
+        }
+      },
+      routes: <RouteBase>[
+        GoRoute(
+          path: 'loginPage',
+          builder: (BuildContext context, GoRouterState state) {
+            return const LoginPage();
+          },
+        ),
+        GoRoute(
+          path: 'editProfile',
+          builder: (BuildContext context, GoRouterState state) {
+            return const EditProfilePage();
+          },
+        ),
+        GoRoute(
+          path: 'forgotPassword',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ForgotPassword();
+          },
+        ),
+        GoRoute(
+          path: 'home',
+          builder: (BuildContext context, GoRouterState state) {
+            return const HomePage();
+          },
+        ),
+        GoRoute(
+          path: 'orderHistory',
+          builder: (BuildContext context, GoRouterState state) {
+            return const OrderHistoryPage();
+          },
+        ),
+        GoRoute(
+          path: 'ownerHome',
+          builder: (BuildContext context, GoRouterState state) {
+            return const OwnerHomePage();
+          },
+        ),
+        GoRoute(
+          path: 'register',
+          builder: (BuildContext context, GoRouterState state) {
+            return const RegisterPage();
+          },
+        ),
+        GoRoute(
+          path: 'viewMenu',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ViewMenu();
+          },
+        ),
+      ],
+    ),
+  ],
+);
+
 class MyApp extends StatelessWidget {
   final User? user;
   const MyApp({Key? key, this.user}) : super(key: key);
@@ -28,7 +95,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: _router,
       title: 'Dapur Emak Ponkel',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -43,7 +111,6 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: user == null ? const LoginPage() : const HomePage(),
     );
   }
 }

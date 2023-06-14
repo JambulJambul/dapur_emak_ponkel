@@ -270,7 +270,7 @@ class _PaymentPageState extends State<PaymentPage> {
     var body = json.encode(data);
     print('Request Body: $body');
     final response = await api.post(
-        "https://052a-113-210-103-189.ngrok-free.app/payment", body);
+        "https://eb38-113-210-103-253.ngrok-free.app/payment", body);
     if (response is Map<String, dynamic>) {
       String redirectUrl = response['redirectUrl'];
       print('URL: $redirectUrl');
@@ -290,7 +290,7 @@ class _PaymentPageState extends State<PaymentPage> {
     while (!paymentCompleted) {
       try {
         final response = await http.get(Uri.parse(
-            'https://052a-113-210-103-189.ngrok-free.app/payment/callback'));
+            'https://eb38-113-210-103-253.ngrok-free.app/payment/callback'));
         if (response.statusCode == 200) {
           final responseData = jsonDecode(response.body);
           String responseOrderId = responseData['order_id'];
