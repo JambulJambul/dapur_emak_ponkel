@@ -49,112 +49,145 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
             horizontal: size.width * 0.1,
             vertical: size.height * 0.05,
           ),
-          child: StreamBuilder(
+          child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('payment')
                 .where("uid", isEqualTo: _auth.currentUser?.uid)
                 .snapshots(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.hasData) {
-                final documents = snapshot.data!.docs;
-                orderedItems = documents
-                    .map((doc) => _createOrderedItemFromData(
-                        doc.data() as Map<String, dynamic>))
-                    .toList();
-
-                return ListView.builder(
-                  itemCount: orderedItems.length,
-                  itemBuilder: (context, index) {
-                    final item = orderedItems[index];
-                    return _buildFoodItemRow(item);
-                  },
-                );
-              } else if (snapshot.hasError) {
+              if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
-              } else {
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator();
               }
+
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Opacity(
+                      opacity: 0.2,
+                      child: Image.asset(
+                        'assets/images/NicePng_restaurant-icon-png_2018040.png', // Replace with the path to your image
+                        width: 150.0,
+                        height: 150.0,
+                      ),
+                    ),
+                    const SizedBox(height: 20.0),
+                    const Text(
+                      'You have not made any order',
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey),
+                    ),
+                  ],
+                ));
+              }
+
+              // Extract the data from the snapshot and build your UI here
+              final List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
+              return SizedBox(
+                height: MediaQuery.of(context)
+                    .size
+                    .height, // Set a fixed height for the ListView.builder
+                child: ListView.builder(
+                  itemCount: documents.length,
+                  itemBuilder: (context, index) {
+                    // Access the data for each document and build your row
+                    final doc = documents[index];
+                    final date = doc['deliveryDate'];
+                    final amount = doc['amount'];
+                    final List<dynamic> cartItems =
+                        doc['cartItems'] as List<dynamic>;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          date,
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                        Text(
+                          "Total Price: Rp$amount",
+                          style: const TextStyle(
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20.0,
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context)
+                              .size
+                              .width, // Set the width to the screen width
+                          height: 150, // Se
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: cartItems.length,
+                            itemBuilder: (context, index) {
+                              final item = cartItems[index];
+                              if (item is Map<String, dynamic>) {
+                                return _buildFoodItemRow(item);
+                              }
+                              return const SizedBox
+                                  .shrink(); // Return an empty SizedBox if item is not a valid map
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              );
             },
           ),
         ));
   }
 
-  orderedItem _createOrderedItemFromData(dynamic data) {
-    final Map<String, dynamic>? dataMap = data as Map<String, dynamic>?;
+  Widget _buildFoodItemRow(Map<String, dynamic> item) {
+    final String name = item['name'] as String;
+    final int quantity = item['quantity'] as int;
+    final String imgUrl = item['imgUrl'] as String;
 
-    if (dataMap == null || dataMap['cartItems'] == null) {
-      return orderedItem(
-        imgUrl: '',
-        label: '',
-        quantity: 0,
-        price: '',
-        deliveryDate: '',
-        status: '',
-      );
-    }
-
-    final List<dynamic> cartItems = dataMap['cartItems'] as List<dynamic>;
-
-    if (cartItems.isEmpty) {
-      return orderedItem(
-        imgUrl: '',
-        label: '',
-        quantity: 0,
-        price: '',
-        deliveryDate: '',
-        status: '',
-      );
-    }
-
-    final Map<String, dynamic> firstCartItem =
-        cartItems[0] as Map<String, dynamic>;
-
-    if (firstCartItem['imgUrl'] == null ||
-        firstCartItem['name'] == null ||
-        firstCartItem['quantity'] == null ||
-        firstCartItem['price'] == null) {
-      return orderedItem(
-        imgUrl: '',
-        label: '',
-        quantity: 0,
-        price: '',
-        deliveryDate: '',
-        status: '',
-      );
-    }
-
-    final String deliveryDate = dataMap['deliveryDate'] as String? ?? '';
-    final String status = dataMap['status'] as String? ?? '';
-
-    return orderedItem(
-      imgUrl: firstCartItem['imgUrl'] as String,
-      label: firstCartItem['name'] as String,
-      quantity: firstCartItem['quantity'] as int,
-      price: firstCartItem['price'] as int,
-      deliveryDate: deliveryDate,
-      status: status,
-    );
-  }
-
-  Widget _buildFoodItemRow(orderedItem item) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      child: Column(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: Image.network(
-              item.imgUrl,
+              imgUrl,
               width: 70.0,
               height: 70.0,
               fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 8.0),
-          Text(item.label),
-          const SizedBox(width: 8.0),
-          Text(item.deliveryDate),
+          const SizedBox(height: 8.0),
+          Text(
+            name,
+            style: const TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4.0),
+          Text(
+            'Amount: $quantity',
+            style: const TextStyle(
+              fontSize: 14.0,
+              color: Colors.grey,
+            ),
+          ),
         ],
       ),
     );

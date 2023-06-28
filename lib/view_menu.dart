@@ -124,7 +124,7 @@ class _ViewMenuState extends State<ViewMenu> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Menu'),
+        title: const Text('Daily Catering'),
         backgroundColor: const Color(0xFFFFA500),
       ),
       body: Padding(
@@ -177,6 +177,30 @@ class _ViewMenuState extends State<ViewMenu> {
                         .snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Opacity(
+                              opacity: 0.2,
+                              child: Image.asset(
+                                'assets/images/NicePng_restaurant-icon-png_2018040.png', // Replace with the path to your image
+                                width: 150.0,
+                                height: 150.0,
+                              ),
+                            ),
+                            const SizedBox(height: 20.0),
+                            const Text(
+                              'Menu is not available for this date',
+                              style: TextStyle(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey),
+                            ),
+                          ],
+                        ));
+                      }
                       if (snapshot.hasData) {
                         cartItems = snapshot.data!.docs.map((menu) {
                           String label = menu['menutitle'];
@@ -208,7 +232,7 @@ class _ViewMenuState extends State<ViewMenu> {
               width: buttonWidth,
               child: ElevatedButton(
                 onPressed: () {
-                  _checkdate(context, _selectedDay!);
+                  _checkdate(context, _selectedDay!, formattedDate);
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFA500)),
@@ -221,11 +245,19 @@ class _ViewMenuState extends State<ViewMenu> {
     );
   }
 
-  void _checkdate(BuildContext context, DateTime selectedDay) async {
+  void _checkdate(
+      BuildContext context, DateTime selectedDay, String formattedDate) async {
     DateTime selectedDate = selectedDay;
     DateTime currentDate = DateTime.now();
     DateTime currentDateFormatted =
         DateTime(currentDate.year, currentDate.month, currentDate.day);
+
+    bool isSnapshotEmpty = await FirebaseFirestore.instance
+        .collection('foodmenu')
+        .where("menudatestring", isEqualTo: formattedDate)
+        .get()
+        .then((snapshot) => snapshot.docs.isEmpty);
+
     if (selectedDay.isBefore(currentDate)) {
       showDialog(
         context: context,
@@ -234,6 +266,24 @@ class _ViewMenuState extends State<ViewMenu> {
             title: const Text('Invalid Date'),
             content:
                 const Text('Order must be made 1 day before the delivery date'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else if (isSnapshotEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Menu Not Available'),
+            content: const Text('Menu is not available for this date'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {

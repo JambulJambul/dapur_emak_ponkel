@@ -17,7 +17,7 @@ class CartItem {
   final String imgUrl;
   final String itemDesc;
   int quantity;
-  var price;
+  int price;
   CartItem({
     required this.imgUrl,
     required this.itemDesc,
@@ -43,7 +43,6 @@ class _CartPageState extends State<CartPage> {
     _cartItems = widget.cartItems;
   }
 
-  final String _selectedPaymentOption = 'Bank Transfer';
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -65,13 +64,13 @@ class _CartPageState extends State<CartPage> {
               children: [
                 const SizedBox(height: 20),
                 ListView.separated(
+                  physics: const NeverScrollableScrollPhysics(),
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   separatorBuilder: (context, index) => const Divider(),
                   itemCount: _cartItems.length,
                   itemBuilder: (context, index) {
                     final item = _cartItems[index];
-
                     return Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(
@@ -104,7 +103,7 @@ class _CartPageState extends State<CartPage> {
                                   ),
                                   const SizedBox(height: 8.0),
                                   Text(
-                                    'RM ${item.price * item.quantity}',
+                                    'Rp${item.price * item.quantity}',
                                     style: const TextStyle(
                                       fontSize: 14,
                                     ),
@@ -116,7 +115,7 @@ class _CartPageState extends State<CartPage> {
                                         icon: const Icon(Icons.remove),
                                         onPressed: () {
                                           setState(() {
-                                            if (item.quantity > 1) {
+                                            if (item.quantity > 0) {
                                               item.quantity--;
                                             }
                                           });
@@ -152,7 +151,7 @@ class _CartPageState extends State<CartPage> {
                 Text(
                     'Order Date: ${DateFormat.yMMMMd().format(widget.deliveryDay)}'),
                 SizedBox(height: size.height * 0.02),
-                Text('Total Price: RM${_calculateTotalPrice()}'),
+                Text('Total Price: Rp${_calculateTotalPrice()}'),
                 SizedBox(height: size.height * 0.05),
                 SizedBox(
                   width: buttonWidth,
@@ -179,8 +178,8 @@ class _CartPageState extends State<CartPage> {
         ));
   }
 
-  double _calculateTotalPrice() {
-    double totalPrice = 0;
+  int _calculateTotalPrice() {
+    int totalPrice = 0;
     for (final item in _cartItems) {
       totalPrice += item.price * item.quantity;
     }

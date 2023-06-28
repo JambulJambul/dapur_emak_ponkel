@@ -18,7 +18,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class PaymentPage extends StatefulWidget {
   final List<CartItem> cartItems;
-  final double totalPrice;
+  final int totalPrice;
   final DateTime deliveryDay;
   const PaymentPage(
       {Key? key,
@@ -115,7 +115,7 @@ class _PaymentPageState extends State<PaymentPage> {
     return Column(
       children: [
         Text(
-          'Total Price: RM ${widget.totalPrice.toStringAsFixed(2)}',
+          'Total Price: Rp${widget.totalPrice.toStringAsFixed(0)}',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
@@ -147,7 +147,7 @@ class _PaymentPageState extends State<PaymentPage> {
     return Column(
       children: [
         Text(
-          'Total Price: RM ${widget.totalPrice.toStringAsFixed(2)}',
+          'Total Price: Rp${widget.totalPrice.toStringAsFixed(0)}',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
@@ -286,7 +286,7 @@ class _PaymentPageState extends State<PaymentPage> {
     var body = json.encode(data);
     print('Request Body: $body');
     final response = await api.post(
-        "https://77b8-113-210-87-32.ngrok-free.app/payment", body);
+        "https://24e1-113-210-86-250.ngrok-free.app/payment", body);
     if (response is Map<String, dynamic>) {
       String redirectUrl = response['redirectUrl'];
       print('URL: $redirectUrl');

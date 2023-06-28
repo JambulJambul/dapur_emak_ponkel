@@ -4,6 +4,7 @@ import 'view_menu.dart';
 import 'package:flutter/services.dart';
 import 'order_history_page.dart';
 import 'edit_profile_page.dart';
+import 'view_custom_menu.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -31,7 +32,7 @@ class _HomePageState extends State<HomePage> {
           appBar: AppBar(
             backgroundColor: const Color(0xFFFFA500),
             automaticallyImplyLeading: false,
-            title: Text("Homepage"),
+            title: const Text("Homepage"),
           ),
           body: SingleChildScrollView(
             child: Padding(
@@ -56,13 +57,13 @@ class _HomePageState extends State<HomePage> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      _buildGridItem(context, 'Menu',
+                      _buildGridItem(context, 'Daily Catering',
                           'assets/images/chef-hat-64.png', const ViewMenu()),
                       _buildGridItem(
                           context,
-                          'Order Process',
+                          'Event Catering',
                           'assets/images/chef-hat-64.png',
-                          const OrderHistoryPage()),
+                          const ViewCustomMenu()),
                       _buildGridItem(
                           context,
                           'Order History',
