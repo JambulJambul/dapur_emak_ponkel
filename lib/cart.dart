@@ -5,6 +5,7 @@ import 'payment_page.dart';
 class CartPage extends StatefulWidget {
   final List<CartItem> cartItems;
   final DateTime deliveryDay;
+  // ignore: prefer_const_constructors_in_immutables
   CartPage({Key? key, required this.cartItems, required this.deliveryDay})
       : super(key: key);
 

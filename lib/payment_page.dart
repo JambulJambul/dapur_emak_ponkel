@@ -16,14 +16,17 @@ import 'api/api_base_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
+// ignore: must_be_immutable
 class PaymentPage extends StatefulWidget {
   final List<CartItem> cartItems;
   final int totalPrice;
   final DateTime deliveryDay;
-  const PaymentPage(
+  DateTime? endDay;
+  PaymentPage(
       {Key? key,
       required this.cartItems,
       required this.totalPrice,
+      this.endDay,
       required this.deliveryDay})
       : super(key: key);
 
