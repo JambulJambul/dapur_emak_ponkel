@@ -173,7 +173,7 @@ class _ViewMenuState extends State<ViewMenu> {
                 child: StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection('foodmenu')
-                        .where("menudatestring", isEqualTo: formattedDate)
+                        .where("menudatestring", arrayContains: (formattedDate))
                         .snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -254,7 +254,7 @@ class _ViewMenuState extends State<ViewMenu> {
 
     bool isSnapshotEmpty = await FirebaseFirestore.instance
         .collection('foodmenu')
-        .where("menudatestring", isEqualTo: formattedDate)
+        .where("menudatestring", arrayContains: (formattedDate))
         .get()
         .then((snapshot) => snapshot.docs.isEmpty);
 
