@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'home_page.dart';
 import 'web_view.dart';
+import 'order_history_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dapur_emak_ponkel/cart.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -19,15 +20,17 @@ import 'package:url_launcher/url_launcher.dart';
 // ignore: must_be_immutable
 class PaymentPage extends StatefulWidget {
   final List<CartItem> cartItems;
+  final String orderType;
   final int totalPrice;
   final DateTime deliveryDay;
-  DateTime? endDay;
+  final int? numberOfDays;
   PaymentPage(
       {Key? key,
       required this.cartItems,
       required this.totalPrice,
-      this.endDay,
-      required this.deliveryDay})
+      this.numberOfDays,
+      required this.deliveryDay,
+      required this.orderType})
       : super(key: key);
 
   @override
@@ -74,6 +77,8 @@ class _PaymentPageState extends State<PaymentPage> {
         'paymentType': "upload",
         'paymentUrl': downloadUrl,
         'uid': user?.uid,
+        'orderType': widget.orderType,
+        if (widget.numberOfDays != null) 'numberOfDays': widget.numberOfDays,
         'deliveryDate':
             DateFormat.yMMMMd().format(widget.deliveryDay).toString(),
         'cartItems': cartItemsData
@@ -87,7 +92,7 @@ class _PaymentPageState extends State<PaymentPage> {
               ElevatedButton(
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const HomePage(),
+                    builder: (context) => const OrderHistoryPage(),
                   ),
                 ),
                 child: const Text('Ok'),
@@ -283,13 +288,15 @@ class _PaymentPageState extends State<PaymentPage> {
       'paymentType': 'midtrans',
       'amount': widget.totalPrice,
       'uid': user?.uid,
+      'orderType': widget.orderType,
+      if (widget.numberOfDays != null) 'numberOfDays': widget.numberOfDays,
       'deliveryDate': DateFormat.yMMMMd().format(widget.deliveryDay).toString(),
       'cartItems': cartItemsData
     };
     var body = json.encode(data);
     print('Request Body: $body');
     final response = await api.post(
-        "https://24e1-113-210-86-250.ngrok-free.app/payment", body);
+        "https://cdf0-113-210-86-250.ngrok-free.app/payment", body);
     if (response is Map<String, dynamic>) {
       String redirectUrl = response['redirectUrl'];
       print('URL: $redirectUrl');

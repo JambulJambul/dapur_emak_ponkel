@@ -38,6 +38,12 @@ final GoRouter _router = GoRouter(
       },
       routes: <RouteBase>[
         GoRoute(
+          path: 'home',
+          builder: (BuildContext context, GoRouterState state) {
+            return const HomePage();
+          },
+        ),
+        GoRoute(
           path: 'loginPage',
           builder: (BuildContext context, GoRouterState state) {
             return const LoginPage();

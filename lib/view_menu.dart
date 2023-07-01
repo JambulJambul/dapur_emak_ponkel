@@ -300,6 +300,7 @@ class _ViewMenuState extends State<ViewMenu> {
         MaterialPageRoute(
           builder: (context) => CartPage(
             cartItems: cartItems,
+            orderType: "daily",
             deliveryDay: selectedDate,
           ),
         ),

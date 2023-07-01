@@ -1,5 +1,6 @@
 import 'dart:ffi';
-
+import 'package:dapur_emak_ponkel/home_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,6 +44,13 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         appBar: AppBar(
           backgroundColor: const Color(0xFFFFA500),
           title: const Text('Order History'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              // Navigate to the homepage when the back button is pressed
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+          ),
         ),
         body: Padding(
           padding: EdgeInsets.symmetric(
@@ -89,8 +97,15 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                 ));
               }
 
-              // Extract the data from the snapshot and build your UI here
               final List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
+              documents.sort((b, a) {
+                final DateFormat dateFormat = DateFormat('MMMM d, y');
+                final DateTime dateA = dateFormat.parse(a['deliveryDate']);
+                final DateTime dateB = dateFormat.parse(b['deliveryDate']);
+                return dateA.compareTo(dateB);
+              });
+
+              // Extract the data from the snapshot and build your UI here
               return SizedBox(
                 height: MediaQuery.of(context)
                     .size
@@ -102,17 +117,36 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                     final doc = documents[index];
                     final date = doc['deliveryDate'];
                     final amount = doc['amount'];
+                    DateTime lastDay = DateFormat('MMMM d, y').parse(date);
                     final List<dynamic> cartItems =
                         doc['cartItems'] as List<dynamic>;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          date,
-                          style: const TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              date,
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            if (doc.data() is Map<String, dynamic> &&
+                                (doc.data() as Map<String, dynamic>)
+                                    .containsKey('numberOfDays')) ...[
+                              const Text(" - "),
+                              Text(
+                                DateFormat.yMMMMd().format(lastDay
+                                    .add(Duration(days: doc['numberOfDays']))),
+                                style: const TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ]
+                          ],
                         ),
                         const SizedBox(
                           height: 10.0,

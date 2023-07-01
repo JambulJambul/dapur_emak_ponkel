@@ -193,7 +193,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
                                                         label: label,
                                                         imgUrl: imgUrl,
                                                         itemDesc: itemDesc,
-                                                        quantity: 1,
+                                                        quantity: 10,
                                                         price: price,
                                                       );
                                                       cartItems.add(cartItem);
@@ -457,7 +457,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
                                                         label: label,
                                                         imgUrl: imgUrl,
                                                         itemDesc: itemDesc,
-                                                        quantity: 1,
+                                                        quantity: 10,
                                                         price: price,
                                                       );
                                                       cartItems.add(cartItem);
@@ -721,7 +721,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
                                                         label: label,
                                                         imgUrl: imgUrl,
                                                         itemDesc: itemDesc,
-                                                        quantity: 1,
+                                                        quantity: 10,
                                                         price: price,
                                                       );
                                                       cartItems.add(cartItem);
@@ -1208,7 +1208,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
                                                         label: label,
                                                         imgUrl: imgUrl,
                                                         itemDesc: itemDesc,
-                                                        quantity: 1,
+                                                        quantity: 10,
                                                         price: price,
                                                       );
                                                       cartItems.add(cartItem);
@@ -1476,7 +1476,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
                                                         label: label,
                                                         imgUrl: imgUrl,
                                                         itemDesc: itemDesc,
-                                                        quantity: 1,
+                                                        quantity: 10,
                                                         price: price,
                                                       );
                                                       cartItems.add(cartItem);
@@ -1823,6 +1823,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => CartPage(
+            orderType: "event",
             cartItems: cartItems,
             deliveryDay: selectedDate,
           ),
@@ -1913,9 +1914,10 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => CartPage(
-            cartItems: cartItems,
-            deliveryDay: selectedDate,
-          ),
+              cartItems: cartItems,
+              orderType: "event",
+              deliveryDay: selectedDate,
+              numberOfDays: numberOfDays),
         ),
       );
     }
