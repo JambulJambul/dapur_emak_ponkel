@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'payment_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'google_maps_page.dart';
+import 'edit_profile_page.dart';
 
 class CartPage extends StatefulWidget {
   final List<CartItem> cartItems;
@@ -45,21 +50,82 @@ class CartItem {
 
 class _CartPageState extends State<CartPage> {
   int bulkQuantity = 10;
+  late GeoPoint destinationCoordinate;
+  late double markerLatitude;
+  late double markerLongtitude;
+  TextEditingController _addressInfoController = TextEditingController();
+  String existingAddressInfo = "";
+  bool coordinateUpdated = false;
+
+  void _checkPersonalAddress(BuildContext context) async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid;
+
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    DocumentSnapshot userSnapshot =
+        await firestore.collection('users').doc(uid).get();
+
+    if (userSnapshot.exists) {
+      Map<String, dynamic>? userData =
+          userSnapshot.data() as Map<String, dynamic>?;
+      if (userData != null && userData.containsKey('addressgeolocation')) {
+        // 'addressgeolocation' field exists in the user document
+        destinationCoordinate = userData['addressgeolocation'] as GeoPoint;
+        setState(() {
+          existingAddressInfo = userData['address'];
+        });
+        // Perform any further operations with the latitude and longitude values
+        // or use them for reverse geocoding if desired.
+      } else {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+                child: AlertDialog(
+                  title: const Text('Address coordinate not found'),
+                  content: const Text('Please update your address coordinate'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Go to profile page'),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => const EditProfilePage()),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                onWillPop: () async {
+                  return false; // Disable back button press
+                });
+          },
+        );
+      }
+    }
+  }
+
+  void handleGeoPointSelected(GeoPoint geoPoint) {
+    destinationCoordinate = geoPoint;
+    coordinateUpdated = true;
+  }
 
   List<CartItem> _cartItems = [];
   @override
   void initState() {
     super.initState();
     _cartItems = widget.cartItems;
+    _checkPersonalAddress(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final double buttonWidth = size.width * 0.6;
+    final textFieldWidth = size.width * 0.8;
     DateTime lastDate =
         widget.deliveryDay.add(Duration(days: widget.numberOfDays ?? 0));
-
     return Scaffold(
         appBar: AppBar(
           title: const Text('Cart'),
@@ -257,34 +323,112 @@ class _CartPageState extends State<CartPage> {
                 ],
                 SizedBox(height: size.height * 0.05),
                 SizedBox(
+                  width: textFieldWidth,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Delivery Address Details: ",
+                      ),
+                      TextField(
+                        controller: _addressInfoController,
+                        decoration:
+                            InputDecoration(hintText: existingAddressInfo),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(height: size.height * 0.02),
+                SizedBox(
+                  child: Text(coordinateUpdated == false
+                      ? "Pin is using your address"
+                      : "Pin has been updated"),
+                ),
+                SizedBox(height: size.height * 0.02),
+                SizedBox(
+                  width: textFieldWidth,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => GoogleMapsPage(
+                            mapContext: 'destination',
+                            onGeoPointSelected: handleGeoPointSelected,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Pinpoint Map'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFFA500),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: size.height * 0.05),
+                SizedBox(
                   width: buttonWidth,
                   child: ElevatedButton(
                     onPressed: () {
-                      if (widget.numberOfDays == null) {
-                        [
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => PaymentPage(
+                      print(destinationCoordinate.latitude.toString());
+                      print(destinationCoordinate.longitude.toString());
+                      String addressInfo = _addressInfoController.text.trim();
+                      if (addressInfo.isEmpty) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Address details missing'),
+                              content: const Text(
+                                  'Please insert the detail of your destination address'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('OK'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        if (widget.numberOfDays == null) {
+                          [
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PaymentPage(
                                   cartItems: _cartItems,
                                   totalPrice: _calculateTotalPrice(),
                                   deliveryDay: widget.deliveryDay,
-                                  orderType: widget.orderType),
-                            ),
-                          )
-                        ];
-                      } else {
-                        [
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => PaymentPage(
+                                  orderType: widget.orderType,
+                                  destinationCoordinate: destinationCoordinate,
+                                  destinationInformation:
+                                      _addressInfoController.text.trim(),
+                                ),
+                              ),
+                            )
+                          ];
+                        } else {
+                          [
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PaymentPage(
                                   cartItems: _cartItems,
                                   totalPrice: _calculateTotalMultiPrice(),
                                   deliveryDay: widget.deliveryDay,
                                   numberOfDays: widget.numberOfDays,
-                                  orderType: widget.orderType),
-                            ),
-                          )
-                        ];
+                                  orderType: widget.orderType,
+                                  destinationCoordinate: destinationCoordinate,
+                                  destinationInformation:
+                                      _addressInfoController.text.trim(),
+                                ),
+                              ),
+                            )
+                          ];
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'google_maps_page.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -43,6 +44,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _existingFullName = data!['fullname'];
         _existingAddress = data['address'];
         _existingPhoneNumber = data['phonenumber'];
+        _fullNameController = TextEditingController(text: _existingFullName);
+        _phoneNumberController =
+            TextEditingController(text: _existingPhoneNumber);
+        _addressController = TextEditingController(text: _existingAddress);
         setState(() {});
       }
     } catch (e) {
@@ -55,14 +60,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final formPadding = size.width * 0.1;
     final textFieldWidth = size.width * 0.8;
 
-    _fullNameController = TextEditingController(text: _existingFullName);
-    _phoneNumberController = TextEditingController(text: _existingPhoneNumber);
-    _addressController = TextEditingController(text: _existingAddress);
-
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFFFFA500),
           title: const Text('Edit Profile'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              // Navigate to the homepage when the back button is pressed
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+          ),
         ),
         body: SingleChildScrollView(
           physics: const NeverScrollableScrollPhysics(),
@@ -127,6 +135,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ],
                   ),
                 ),
+                SizedBox(height: size.height * 0.02),
+                SizedBox(
+                  width: textFieldWidth,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const GoogleMapsPage(
+                            mapContext: 'profile',
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Select Map'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFFA500),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ),
                 SizedBox(height: size.height * 0.05),
                 SizedBox(
                   width: textFieldWidth,
@@ -171,7 +201,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     String address = _addressController.text.trim();
 
     try {
-      await _firestore.collection("users").doc(user?.uid).set({
+      await _firestore.collection("users").doc(user?.uid).update({
         'address': address,
         'fullname': fullName,
         'phonenumber': phoneNumber

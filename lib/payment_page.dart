@@ -17,20 +17,23 @@ import 'api/api_base_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
-// ignore: must_be_immutable
 class PaymentPage extends StatefulWidget {
   final List<CartItem> cartItems;
   final String orderType;
   final int totalPrice;
   final DateTime deliveryDay;
   final int? numberOfDays;
-  PaymentPage(
+  final GeoPoint destinationCoordinate;
+  final String destinationInformation;
+  const PaymentPage(
       {Key? key,
       required this.cartItems,
       required this.totalPrice,
       this.numberOfDays,
       required this.deliveryDay,
-      required this.orderType})
+      required this.orderType,
+      required this.destinationCoordinate,
+      required this.destinationInformation})
       : super(key: key);
 
   @override
@@ -81,7 +84,9 @@ class _PaymentPageState extends State<PaymentPage> {
         if (widget.numberOfDays != null) 'numberOfDays': widget.numberOfDays,
         'deliveryDate':
             DateFormat.yMMMMd().format(widget.deliveryDay).toString(),
-        'cartItems': cartItemsData
+        'destinationgeolocation': widget.destinationCoordinate,
+        'cartItems': cartItemsData,
+        'destinationinformation': widget.destinationInformation
       });
       showDialog(
         context: context,
@@ -291,12 +296,15 @@ class _PaymentPageState extends State<PaymentPage> {
       'orderType': widget.orderType,
       if (widget.numberOfDays != null) 'numberOfDays': widget.numberOfDays,
       'deliveryDate': DateFormat.yMMMMd().format(widget.deliveryDay).toString(),
-      'cartItems': cartItemsData
+      'destinationlatitude': widget.destinationCoordinate.latitude,
+      'destinationlongtitude': widget.destinationCoordinate.longitude,
+      'cartItems': cartItemsData,
+      'destinationinformation': widget.destinationInformation
     };
     var body = json.encode(data);
     print('Request Body: $body');
     final response = await api.post(
-        "https://cdf0-113-210-86-250.ngrok-free.app/payment", body);
+        "https://75ab-113-210-86-250.ngrok-free.app/payment", body);
     if (response is Map<String, dynamic>) {
       String redirectUrl = response['redirectUrl'];
       print('URL: $redirectUrl');

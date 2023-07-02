@@ -10,7 +10,7 @@ import 'view_menu.dart';
 import 'view_custom_menu.dart';
 import 'payment_page.dart';
 import 'cart.dart';
-import 'test_page123.dart';
+import 'google_maps_page.dart';
 import 'edit_profile_page.dart';
 import 'order_history_page.dart';
 import 'owner_home_page.dart';
