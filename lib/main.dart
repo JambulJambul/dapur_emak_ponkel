@@ -33,7 +33,7 @@ final GoRouter _router = GoRouter(
         if (user == null) {
           return const LoginPage();
         } else {
-          return const HomePage();
+          return const OwnerHomePage();
         }
       },
       routes: <RouteBase>[

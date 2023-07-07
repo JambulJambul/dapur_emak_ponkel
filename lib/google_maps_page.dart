@@ -20,7 +20,7 @@ class GoogleMapsPage extends StatefulWidget {
 class _GoogleMapsPageState extends State<GoogleMapsPage> {
   GoogleMapController? _mapController;
   LatLng markerPosition =
-      LatLng(-6.175544, 106.827649); // Initial marker position
+      const LatLng(-6.175544, 106.827649); // Initial marker position
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @override
@@ -114,7 +114,7 @@ class _GoogleMapsPageState extends State<GoogleMapsPage> {
           },
         ),
         floatingActionButton: Padding(
-          padding: EdgeInsets.fromLTRB(0, 0, 0, 30),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 30),
           child: Container(
             alignment: Alignment.bottomCenter,
             child: FloatingActionButton(
@@ -127,7 +127,7 @@ class _GoogleMapsPageState extends State<GoogleMapsPage> {
                 }
                 Navigator.pop(context);
               },
-              child: Text('Done'),
+              child: const Text('Done'),
             ),
           ),
         ));

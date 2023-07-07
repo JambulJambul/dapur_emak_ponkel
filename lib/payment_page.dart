@@ -214,7 +214,11 @@ class _PaymentPageState extends State<PaymentPage> {
         ElevatedButton(
           style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFFA500)),
-          onPressed: () {},
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const OrderHistoryPage(),
+            ),
+          ),
           child: const Text('Continue'),
         ),
       ],
@@ -304,7 +308,8 @@ class _PaymentPageState extends State<PaymentPage> {
     var body = json.encode(data);
     print('Request Body: $body');
     final response = await api.post(
-        "https://75ab-113-210-86-250.ngrok-free.app/payment", body);
+        "https://us-central1-dapuremakponkel-2c750.cloudfunctions.net/api/payment",
+        body);
     if (response is Map<String, dynamic>) {
       String redirectUrl = response['redirectUrl'];
       print('URL: $redirectUrl');

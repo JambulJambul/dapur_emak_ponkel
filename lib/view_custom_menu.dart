@@ -1823,7 +1823,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => CartPage(
-            orderType: "event",
+            orderType: "daily",
             cartItems: cartItems,
             deliveryDay: selectedDate,
           ),
@@ -1915,7 +1915,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
         MaterialPageRoute(
           builder: (context) => CartPage(
               cartItems: cartItems,
-              orderType: "event",
+              orderType: "multiday",
               deliveryDay: selectedDate,
               numberOfDays: numberOfDays),
         ),

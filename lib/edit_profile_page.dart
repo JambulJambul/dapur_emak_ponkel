@@ -1,3 +1,4 @@
+import 'package:dapur_emak_ponkel/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
@@ -68,7 +69,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
               // Navigate to the homepage when the back button is pressed
-              Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const HomePage(),
+                ),
+              );
             },
           ),
         ),
