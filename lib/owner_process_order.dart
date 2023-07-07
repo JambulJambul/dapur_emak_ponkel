@@ -1,11 +1,14 @@
 import 'dart:ffi';
 import 'owner_home_page.dart';
 import 'fixed_google_maps_page.dart';
+import 'dart:io';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as Path;
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'google_maps_page.dart';
@@ -23,6 +26,72 @@ class _OwnerProcessOrderPageState extends State<OwnerProcessOrderPage> {
   DateTime? _selectedDay = DateTime.now();
   String selectedSquare = 'Square 1';
   bool isItSquareOne = true;
+
+  Future<void> _uploadFileFirebase(File file, String docid) async {
+    try {
+      String fileName = Path.basename(file.path);
+      String documentId = docid;
+      Reference ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('payment/cancelorder/$fileName');
+      UploadTask uploadTask = ref.putFile(file);
+      await uploadTask.whenComplete(() => null);
+      String downloadUrl = await ref.getDownloadURL();
+      var orderId = DateTime.now().millisecondsSinceEpoch.toString();
+      FirebaseFirestore.instance.collection('payment').doc(documentId).update({
+        'processStatus': 'cancelled',
+        'cancelUrl': downloadUrl,
+      }).then((value) {
+        print('Value updated successfully');
+      }).catchError((error) {
+        print('Error updating value: $error');
+      });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: const Text('Cancel Proof has been uploaded'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Ok'),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: const Text('Upload error, please try again.'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Exit'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<File?> _uploadFile() async {
+    File? selectedFile;
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      selectedFile = File(pickedFile.path);
+      return selectedFile;
+    } else {
+      print('Image picker canceled');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -253,9 +322,9 @@ class _OwnerProcessOrderPageState extends State<OwnerProcessOrderPage> {
                                 }
 
                                 final user = snapshot.data!;
-                                final userName =
-                                    user['fullname']; // Get the user's name
-
+                                final userName = user['fullname'];
+                                final userPhone = user['phonenumber'];
+                                final userEmail = user['email'];
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -790,6 +859,134 @@ class _OwnerProcessOrderPageState extends State<OwnerProcessOrderPage> {
                                               if (processStatus ==
                                                   'ordercompleted') ...[
                                                 const Text("Order completed"),
+                                              ],
+                                              if (processStatus ==
+                                                  'cancelled') ...[
+                                                const Text("Order cancelled"),
+                                              ],
+                                              if (processStatus ==
+                                                  'cancelrequested') ...[
+                                                const Text("Refund requested"),
+                                                const SizedBox(
+                                                  width: 50,
+                                                ),
+                                                SizedBox(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return Dialog(
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          16.0),
+                                                            ),
+                                                            child:
+                                                                IntrinsicWidth(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .fromLTRB(
+                                                                        16,
+                                                                        16,
+                                                                        16,
+                                                                        16),
+                                                                child: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    const SizedBox(
+                                                                      height:
+                                                                          10,
+                                                                    ),
+                                                                    const Text(
+                                                                      "Please upload proof of refund",
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              16),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      height:
+                                                                          10,
+                                                                    ),
+                                                                    Text(
+                                                                      "User information:\n\nName: $userName\nPhone Number: $userPhone\nEmail: $userEmail",
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      height:
+                                                                          10,
+                                                                    ),
+                                                                    ElevatedButton(
+                                                                      style: ElevatedButton.styleFrom(
+                                                                          backgroundColor:
+                                                                              const Color(0xFFFFA500)),
+                                                                      onPressed:
+                                                                          () async {
+                                                                        File?
+                                                                            file =
+                                                                            await _uploadFile();
+                                                                        _uploadFileFirebase(
+                                                                            file!,
+                                                                            documentId);
+                                                                      },
+                                                                      child: const Text(
+                                                                          'Upload Refund Proof'),
+                                                                    ),
+                                                                    Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .center,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          ElevatedButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            style:
+                                                                                ButtonStyle(
+                                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.orange),
+                                                                            ),
+                                                                            child:
+                                                                                const Text("Yes"),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: const Text(
+                                                        'Upload refund proof'),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xFFFFA500),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
                                               ]
                                             ]))
                                       ],
@@ -826,6 +1023,15 @@ class _OwnerProcessOrderPageState extends State<OwnerProcessOrderPage> {
                                     ),
                                     Text(
                                       "Destination Information: $destinationInfo",
+                                      style: const TextStyle(
+                                        fontSize: 14.0,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10.0,
+                                    ),
+                                    Text(
+                                      "Customer Phone Number: $userPhone",
                                       style: const TextStyle(
                                         fontSize: 14.0,
                                       ),

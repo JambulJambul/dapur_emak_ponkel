@@ -106,10 +106,17 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                           itemBuilder: (context, index) {
                             // Access the data for each document and build your row
                             final doc = documents[index];
+                            final documentId = doc.id;
                             final date = doc['deliveryDate'];
                             final amount = doc['amount'];
                             DateTime lastDay =
                                 DateFormat('MMMM d, y').parse(date);
+                            String processStatus = doc['processStatus'];
+                            String refundUrl =
+                                "https://firebasestorage.googleapis.com/v0/b/dapuremakponkel-2c750.appspot.com/o/asset%2FNicePng_restaurant-icon-png_2018040.png?alt=media&token=779fb08e-112b-42d3-a501-6a7331e9e16a";
+                            if (processStatus == 'cancelled') {
+                              refundUrl = doc['cancelUrl'] ?? refundUrl;
+                            }
                             final List<dynamic> cartItems =
                                 doc['cartItems'] as List<dynamic>;
                             return Column(
@@ -144,6 +151,53 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                                 const SizedBox(
                                   height: 10.0,
                                 ),
+                                if (processStatus == 'checkingpayment') ...[
+                                  const Text(
+                                      "Order Status: Checking your payment"),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
+                                if (processStatus == 'beforeprocess') ...[
+                                  const Text(
+                                      "Order Status: Preparing your order"),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
+                                if (processStatus == 'processing') ...[
+                                  const Text(
+                                      "Order Status: Processing your order"),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
+                                if (processStatus == 'delivering') ...[
+                                  const Text(
+                                      "Order Status: Delivering your order"),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
+                                if (processStatus == 'ordercompleted') ...[
+                                  const Text("Order Status: Food has arrived"),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
+                                if (processStatus == 'cancelled') ...[
+                                  const Text(
+                                      "Order Status: Order has been cancelled"),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
+                                if (processStatus == 'cancelrequested') ...[
+                                  const Text("Order Status: Refund in process"),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
                                 Text(
                                   "Total Price: Rp$amount",
                                   style: const TextStyle(
@@ -157,7 +211,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                                   width: MediaQuery.of(context)
                                       .size
                                       .width, // Set the width to the screen width
-                                  height: 150, // Se
+                                  height: 140, // Se
                                   child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
                                     itemCount: cartItems.length,
@@ -171,6 +225,341 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                                     },
                                   ),
                                 ),
+                                if (processStatus == 'checkingpayment' ||
+                                    processStatus == 'beforeprocess') ...[
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Dialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.0),
+                                            ),
+                                            child: IntrinsicWidth(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        16, 16, 16, 16),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      "Are you sure to cancel your order?",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 16),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStateProperty.all<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .grey),
+                                                            ),
+                                                            child: const Text(
+                                                                "No"),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 10),
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              FirebaseFirestore
+                                                                  .instance
+                                                                  .collection(
+                                                                      'payment')
+                                                                  .doc(
+                                                                      documentId)
+                                                                  .update({
+                                                                'processStatus':
+                                                                    'cancelrequested',
+                                                              }).then((value) {
+                                                                print(
+                                                                    'Value updated successfully');
+                                                              }).catchError(
+                                                                      (error) {
+                                                                print(
+                                                                    'Error updating value: $error');
+                                                              });
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStateProperty.all<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .red),
+                                                            ),
+                                                            child: const Text(
+                                                                "Yes"),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Text("Cancel Order"),
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.red),
+                                    ),
+                                  )
+                                ] else if (processStatus ==
+                                    'cancelrequested') ...[
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Dialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.0),
+                                            ),
+                                            child: IntrinsicWidth(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        16, 16, 16, 16),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      "Your refund is in process",
+                                                      style: TextStyle(
+                                                          fontSize: 16),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStateProperty.all<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .orange),
+                                                            ),
+                                                            child: const Text(
+                                                                "Ok"),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Text("Cancel Order"),
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.grey),
+                                    ),
+                                  )
+                                ] else if (processStatus == 'cancelled') ...[
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Dialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.0),
+                                            ),
+                                            child: IntrinsicWidth(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        0, 16, 0, 16),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      "Refund Proof",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 16),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    ClipRRect(
+                                                      child: Image.network(
+                                                        refundUrl,
+                                                        fit: BoxFit
+                                                            .cover, // Adjust the fit mode as needed
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStateProperty.all<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .orange),
+                                                            ),
+                                                            child: const Text(
+                                                                "Ok"),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Text("Refund Proof"),
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.orange),
+                                    ),
+                                  )
+                                ] else ...[
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Dialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.0),
+                                            ),
+                                            child: IntrinsicWidth(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        16, 16, 16, 16),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      "Your order is already processed and cannot be cancelled.",
+                                                      style: TextStyle(
+                                                          fontSize: 16),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStateProperty.all<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .orange),
+                                                            ),
+                                                            child: const Text(
+                                                                "Ok"),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Text("Cancel Order"),
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.grey),
+                                    ),
+                                  )
+                                ],
+                                const SizedBox(
+                                  height: 20,
+                                )
                               ],
                             );
                           },
