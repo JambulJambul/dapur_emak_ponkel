@@ -75,6 +75,7 @@ class _PaymentPageState extends State<PaymentPage> {
       String downloadUrl = await ref.getDownloadURL();
       var orderId = DateTime.now().millisecondsSinceEpoch.toString();
       await _firestore.collection('payment').add({
+        'processStatus': 'checkingpayment',
         'amount': widget.totalPrice,
         'orderId': orderId,
         'paymentType': "upload",
@@ -84,7 +85,7 @@ class _PaymentPageState extends State<PaymentPage> {
         if (widget.numberOfDays != null) 'numberOfDays': widget.numberOfDays,
         'deliveryDate':
             DateFormat.yMMMMd().format(widget.deliveryDay).toString(),
-        'destinationgeolocation': widget.destinationCoordinate,
+        'geoPoint': widget.destinationCoordinate,
         'cartItems': cartItemsData,
         'destinationinformation': widget.destinationInformation
       });
@@ -293,6 +294,7 @@ class _PaymentPageState extends State<PaymentPage> {
     }
     var orderId = DateTime.now().millisecondsSinceEpoch.toString();
     Map data = {
+      'processStatus': 'beforeprocess',
       'orderId': orderId,
       'paymentType': 'midtrans',
       'amount': widget.totalPrice,

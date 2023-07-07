@@ -213,6 +213,7 @@ class _OwnerProcessOrderPageState extends State<OwnerProcessOrderPage> {
                           itemBuilder: (context, index) {
                             // Access the data for each document and build your row
                             final doc = documents[index];
+                            final documentId = doc.id;
                             final date = doc['deliveryDate'];
                             final amount = doc['amount'];
                             DateTime lastDay =
@@ -224,6 +225,13 @@ class _OwnerProcessOrderPageState extends State<OwnerProcessOrderPage> {
                                 doc['destinationinformation'];
                             final GeoPoint destinationCoordinate =
                                 doc['geoPoint'];
+                            String processStatus = doc['processStatus'];
+                            String paymentUrl =
+                                "https://firebasestorage.googleapis.com/v0/b/dapuremakponkel-2c750.appspot.com/o/asset%2FNicePng_restaurant-icon-png_2018040.png?alt=media&token=779fb08e-112b-42d3-a501-6a7331e9e16a";
+                            if (processStatus == 'checkingpayment') {
+                              paymentUrl = doc['paymentUrl'] ?? paymentUrl;
+                            }
+                            ;
                             return FutureBuilder<DocumentSnapshot>(
                               future: FirebaseFirestore.instance
                                   .collection('users')
@@ -293,6 +301,501 @@ class _OwnerProcessOrderPageState extends State<OwnerProcessOrderPage> {
                                     ),
                                     const SizedBox(
                                       height: 10.0,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                            child: Wrap(
+                                                alignment: WrapAlignment.start,
+                                                children: [
+                                              const Text("Status: "),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              if (processStatus ==
+                                                  'checkingpayment') ...[
+                                                const Text(
+                                                    "Payment proof received"),
+                                                const SizedBox(
+                                                  width: 50,
+                                                ),
+                                                SizedBox(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return Dialog(
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          16.0),
+                                                            ),
+                                                            child:
+                                                                IntrinsicWidth(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .fromLTRB(
+                                                                        0,
+                                                                        0,
+                                                                        0,
+                                                                        16),
+                                                                child: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    ClipRRect(
+                                                                      borderRadius:
+                                                                          const BorderRadius
+                                                                              .only(
+                                                                        topLeft:
+                                                                            Radius.circular(16.0),
+                                                                        topRight:
+                                                                            Radius.circular(16.0),
+                                                                      ),
+                                                                      child: Image
+                                                                          .network(
+                                                                        paymentUrl,
+                                                                        fit: BoxFit
+                                                                            .cover, // Adjust the fit mode as needed
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      height:
+                                                                          10,
+                                                                    ),
+                                                                    const Text(
+                                                                      "Confirm Payment",
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              16),
+                                                                    ),
+                                                                    Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .center,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          ElevatedButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            style:
+                                                                                ButtonStyle(
+                                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                                                                            ),
+                                                                            child:
+                                                                                const Text("No"),
+                                                                          ),
+                                                                          const SizedBox(
+                                                                              width: 10),
+                                                                          ElevatedButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              FirebaseFirestore.instance.collection('payment').doc(documentId).update({
+                                                                                'processStatus': 'beforeprocess',
+                                                                              }).then((value) {
+                                                                                print('Value updated successfully');
+                                                                              }).catchError((error) {
+                                                                                print('Error updating value: $error');
+                                                                              });
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            style:
+                                                                                ButtonStyle(
+                                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.orange),
+                                                                            ),
+                                                                            child:
+                                                                                const Text("Yes"),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: const Text(
+                                                        'View payment proof'),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xFFFFA500),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                              if (processStatus ==
+                                                  'beforeprocess') ...[
+                                                const Text("Payment Confirmed"),
+                                                const SizedBox(width: 30),
+                                                SizedBox(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return Dialog(
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          16.0),
+                                                            ),
+                                                            child:
+                                                                IntrinsicWidth(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .fromLTRB(
+                                                                        16,
+                                                                        16,
+                                                                        16,
+                                                                        16),
+                                                                child: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Process Order",
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              16),
+                                                                    ),
+                                                                    Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .center,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          ElevatedButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            style:
+                                                                                ButtonStyle(
+                                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                                                                            ),
+                                                                            child:
+                                                                                const Text("No"),
+                                                                          ),
+                                                                          const SizedBox(
+                                                                              width: 10),
+                                                                          ElevatedButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              FirebaseFirestore.instance.collection('payment').doc(documentId).update({
+                                                                                'processStatus': 'processing',
+                                                                              }).then((value) {
+                                                                                print('Value updated successfully');
+                                                                              }).catchError((error) {
+                                                                                print('Error updating value: $error');
+                                                                              });
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            style:
+                                                                                ButtonStyle(
+                                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.orange),
+                                                                            ),
+                                                                            child:
+                                                                                const Text("Yes"),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: const Text(
+                                                        'Process Order'),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xFFFFA500),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                              if (processStatus ==
+                                                  'processing') ...[
+                                                const Text("Processing order"),
+                                                const SizedBox(
+                                                  width: 50,
+                                                ),
+                                                SizedBox(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return Dialog(
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          16.0),
+                                                            ),
+                                                            child:
+                                                                IntrinsicWidth(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .fromLTRB(
+                                                                        16,
+                                                                        16,
+                                                                        16,
+                                                                        16),
+                                                                child: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Deliver item?",
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              16),
+                                                                    ),
+                                                                    Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .center,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          ElevatedButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            style:
+                                                                                ButtonStyle(
+                                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                                                                            ),
+                                                                            child:
+                                                                                const Text("No"),
+                                                                          ),
+                                                                          const SizedBox(
+                                                                              width: 10),
+                                                                          ElevatedButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              FirebaseFirestore.instance.collection('payment').doc(documentId).update({
+                                                                                'processStatus': 'delivering',
+                                                                              }).then((value) {
+                                                                                print('Value updated successfully');
+                                                                              }).catchError((error) {
+                                                                                print('Error updating value: $error');
+                                                                              });
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            style:
+                                                                                ButtonStyle(
+                                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.orange),
+                                                                            ),
+                                                                            child:
+                                                                                const Text("Yes"),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: const Text(
+                                                        'Deliver item'),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xFFFFA500),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                              if (processStatus ==
+                                                  'delivering') ...[
+                                                const Text("Delivering order"),
+                                                const SizedBox(
+                                                  width: 50,
+                                                ),
+                                                SizedBox(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return Dialog(
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          16.0),
+                                                            ),
+                                                            child:
+                                                                IntrinsicWidth(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .fromLTRB(
+                                                                        16,
+                                                                        16,
+                                                                        16,
+                                                                        16),
+                                                                child: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Item has arrived?",
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              16),
+                                                                    ),
+                                                                    Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .center,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          ElevatedButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            style:
+                                                                                ButtonStyle(
+                                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                                                                            ),
+                                                                            child:
+                                                                                const Text("No"),
+                                                                          ),
+                                                                          const SizedBox(
+                                                                              width: 10),
+                                                                          ElevatedButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              FirebaseFirestore.instance.collection('payment').doc(documentId).update({
+                                                                                'processStatus': 'ordercompleted',
+                                                                              }).then((value) {
+                                                                                print('Value updated successfully');
+                                                                              }).catchError((error) {
+                                                                                print('Error updating value: $error');
+                                                                              });
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            style:
+                                                                                ButtonStyle(
+                                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.orange),
+                                                                            ),
+                                                                            child:
+                                                                                const Text("Yes"),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: const Text(
+                                                        'Item has arrived'),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xFFFFA500),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                              if (processStatus ==
+                                                  'ordercompleted') ...[
+                                                const Text("Order completed"),
+                                              ]
+                                            ]))
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
                                     ),
                                     Text(
                                       "Total Price: Rp$amount",

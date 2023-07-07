@@ -20,7 +20,7 @@ class _GoogleMapPageFixedState extends State<GoogleMapPageFixed> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFA500),
-        title: Text('Destination Pin'),
+        title: const Text('Destination Pin'),
       ),
       body: GoogleMap(
         onMapCreated: (GoogleMapController controller) {
