@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -18,9 +17,6 @@ class OwnerManageMenu extends StatefulWidget {
 }
 
 class _OwnerManageMenuState extends State<OwnerManageMenu> {
-  DateTime _focusedDay = DateTime.now().add(const Duration(days: 1));
-  DateTime? _selectedDay = DateTime.now().add(const Duration(days: 1));
-  DateTime? _lastDay = DateTime.now().add(const Duration(days: 2));
   TextEditingController _menuTitleController = TextEditingController();
   TextEditingController _menuDescriptionController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
@@ -45,10 +41,13 @@ class _OwnerManageMenuState extends State<OwnerManageMenu> {
         menuDescription = _menuDescriptionController.text.trim();
       }
       if (_priceController.text.trim().isNotEmpty) {
-        double? price = double.tryParse(_priceController.text);
+        double? parsedPrice = double.tryParse(_priceController.text);
+        if (parsedPrice != null) {
+          price = parsedPrice.toInt();
+        }
       }
       if (file != null) {
-        String downloadUrl = await _uploadImageFirebase(file!);
+        downloadUrl = await _uploadImageFirebase(file!);
       }
 
       await FirebaseFirestore.instance.collection('foodmenu').doc(docid).update(
@@ -63,12 +62,12 @@ class _OwnerManageMenuState extends State<OwnerManageMenu> {
       );
       showDialog(
         context: context,
-        builder: (BuildContext context) {
+        builder: (BuildContext dialogContext) {
           return AlertDialog(
             content: const Text('Menu has been edited'),
             actions: <Widget>[
               ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.of(dialogContext).pop(),
                 child: const Text('Exit'),
               ),
             ],
@@ -78,12 +77,12 @@ class _OwnerManageMenuState extends State<OwnerManageMenu> {
     } catch (e) {
       showDialog(
         context: context,
-        builder: (BuildContext context) {
+        builder: (BuildContext dialogContext) {
           return AlertDialog(
             content: const Text('Upload error, please try again.'),
             actions: <Widget>[
               ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.of(dialogContext).pop(),
                 child: const Text('Exit'),
               ),
             ],

@@ -22,7 +22,6 @@ void main() async {
   await Firebase.initializeApp();
   FirebaseAuth auth = FirebaseAuth.instance;
   User? user = auth.currentUser;
-
   runApp(MyApp(user: user));
 }
 

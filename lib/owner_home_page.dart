@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'owner_process_order.dart';
 import 'order_history_page.dart';
 import 'edit_profile_page.dart';
-import 'view_custom_menu.dart';
+import 'edit_daily_menu.dart';
 import 'manage_menu.dart';
 
 class OwnerHomePage extends StatefulWidget {
@@ -66,9 +66,9 @@ class _OwnerHomePageState extends State<OwnerHomePage> {
                           const OwnerProcessOrderPage()),
                       _buildGridItem(
                           context,
-                          'Order History',
+                          'Manage Daily Menu',
                           'assets/images/chef-hat-64.png',
-                          const OrderHistoryPage()),
+                          const EditDailyMenu()),
                       _buildGridItem(
                           context,
                           'Manage Menu',

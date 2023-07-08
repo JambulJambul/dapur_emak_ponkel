@@ -168,13 +168,13 @@ class _LoginPageState extends State<LoginPage> {
         if (userType == 'owner') {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => OwnerHomePage(),
+              builder: (context) => const OwnerHomePage(),
             ),
           );
         } else if (userType == 'customer') {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => HomePage(),
+              builder: (context) => const HomePage(),
             ),
           );
         }
