@@ -7,6 +7,7 @@ import 'order_history_page.dart';
 import 'edit_profile_page.dart';
 import 'edit_daily_menu.dart';
 import 'manage_menu.dart';
+import 'sales_report.dart';
 
 class OwnerHomePage extends StatefulWidget {
   const OwnerHomePage({Key? key}) : super(key: key);
@@ -74,6 +75,8 @@ class _OwnerHomePageState extends State<OwnerHomePage> {
                           'Manage Menu',
                           'assets/images/chef-hat-64.png',
                           const OwnerManageMenu()),
+                      _buildGridItem(context, 'Sales Report',
+                          'assets/images/chef-hat-64.png', const SalesReport()),
                       _buildGridItem(
                           context,
                           'My Profile',

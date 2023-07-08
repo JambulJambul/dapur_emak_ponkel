@@ -134,6 +134,46 @@ class _RegisterPageState extends State<RegisterPage> {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
+    if (fullName.isEmpty ||
+        phoneNumber.isEmpty ||
+        address.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: const Text('Please input correct information'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    if (password.length < 6) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: const Text('Password should be at least 6 characters'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
