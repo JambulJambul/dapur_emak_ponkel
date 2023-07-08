@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'inc/dynamic_link_handler.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_page.dart';
 import 'register_page.dart';
 import 'forgot_password.dart';
@@ -33,7 +34,31 @@ final GoRouter _router = GoRouter(
         if (user == null) {
           return const LoginPage();
         } else {
-          return const OwnerHomePage();
+          FirebaseFirestore firestore = FirebaseFirestore.instance;
+          DocumentReference userRef =
+              firestore.collection('users').doc(user?.uid);
+
+          return StreamBuilder<DocumentSnapshot>(
+            stream: userRef.snapshots(),
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return const Text('Error retrieving user data');
+              } else {
+                String? userType = snapshot.data?.get('usertype') as String?;
+
+                if (userType == 'customer') {
+                  return const HomePage();
+                } else if (userType == 'owner') {
+                  return const OwnerHomePage();
+                } else {
+                  return const LoginPage();
+                }
+              }
+            },
+          );
         }
       },
       routes: <RouteBase>[

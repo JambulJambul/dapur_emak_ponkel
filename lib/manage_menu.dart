@@ -65,7 +65,7 @@ class _OwnerManageMenuState extends State<OwnerManageMenu> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: const Text('Menu has been uploaded'),
+            content: const Text('Menu has been edited'),
             actions: <Widget>[
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
