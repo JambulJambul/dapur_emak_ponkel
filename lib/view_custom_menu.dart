@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:intl/intl.dart';
 import 'cart.dart';
 
@@ -92,7 +91,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
                 stream: FirebaseFirestore.instance
                     .collection('foodmenu')
                     .where("eventmenu", isEqualTo: true)
-                    .where("eventtype", isEqualTo: "maincourse")
+                    .where("foodtype", isEqualTo: "maincourse")
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -357,7 +356,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
                 stream: FirebaseFirestore.instance
                     .collection('foodmenu')
                     .where("eventmenu", isEqualTo: true)
-                    .where("eventtype", isEqualTo: "sidedish")
+                    .where("foodtype", isEqualTo: "sidedish")
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -620,7 +619,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
                 stream: FirebaseFirestore.instance
                     .collection('foodmenu')
                     .where("eventmenu", isEqualTo: true)
-                    .where("eventtype", isEqualTo: "riceoption")
+                    .where("foodtype", isEqualTo: "riceoption")
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -1107,7 +1106,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
                 stream: FirebaseFirestore.instance
                     .collection('foodmenu')
                     .where("eventmenu", isEqualTo: true)
-                    .where("eventtype", isEqualTo: "multiday")
+                    .where("foodtype", isEqualTo: "multiday")
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -1375,7 +1374,7 @@ class _ViewCustomMenuState extends State<ViewCustomMenu> {
                 stream: FirebaseFirestore.instance
                     .collection('foodmenu')
                     .where("eventmenu", isEqualTo: true)
-                    .where("eventtype", isEqualTo: "riceoption")
+                    .where("foodtype", isEqualTo: "riceoption")
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {

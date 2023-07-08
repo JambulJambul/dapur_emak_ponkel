@@ -6,6 +6,7 @@ import 'owner_process_order.dart';
 import 'order_history_page.dart';
 import 'edit_profile_page.dart';
 import 'view_custom_menu.dart';
+import 'manage_menu.dart';
 
 class OwnerHomePage extends StatefulWidget {
   const OwnerHomePage({Key? key}) : super(key: key);
@@ -70,9 +71,9 @@ class _OwnerHomePageState extends State<OwnerHomePage> {
                           const OrderHistoryPage()),
                       _buildGridItem(
                           context,
-                          'Event Catering',
+                          'Manage Menu',
                           'assets/images/chef-hat-64.png',
-                          const ViewCustomMenu()),
+                          const OwnerManageMenu()),
                       _buildGridItem(
                           context,
                           'My Profile',

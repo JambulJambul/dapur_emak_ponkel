@@ -958,7 +958,7 @@ class _OwnerProcessOrderPageState extends State<OwnerProcessOrderPage> {
                                                                               backgroundColor: MaterialStateProperty.all<Color>(Colors.orange),
                                                                             ),
                                                                             child:
-                                                                                const Text("Yes"),
+                                                                                const Text("Ok"),
                                                                           ),
                                                                         ],
                                                                       ),
