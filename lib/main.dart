@@ -15,6 +15,7 @@ import 'google_maps_page.dart';
 import 'edit_profile_page.dart';
 import 'order_history_page.dart';
 import 'owner_home_page.dart';
+import 'admin_home_page.dart';
 import 'package:go_router/go_router.dart';
 
 void main() async {
@@ -52,6 +53,8 @@ final GoRouter _router = GoRouter(
                   return const HomePage();
                 } else if (userType == 'owner') {
                   return const OwnerHomePage();
+                } else if (userType == 'admin') {
+                  return const AdminHomePage();
                 } else {
                   return const LoginPage();
                 }

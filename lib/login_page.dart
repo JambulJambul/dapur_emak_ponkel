@@ -6,6 +6,7 @@ import 'register_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'owner_home_page.dart';
+import 'admin_home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -154,6 +155,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _loginPressed(BuildContext context) async {
+    errormessage = 0;
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
     try {
@@ -171,10 +173,18 @@ class _LoginPageState extends State<LoginPage> {
               builder: (context) => const OwnerHomePage(),
             ),
           );
-        } else if (userType == 'customer') {
+        }
+        if (userType == 'customer') {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const HomePage(),
+            ),
+          );
+        }
+        if (userType == 'admin') {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const AdminHomePage(),
             ),
           );
         }

@@ -174,6 +174,26 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
+    RegExp emailRegExp = RegExp(
+        r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$');
+    if (!emailRegExp.hasMatch(email)) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: const Text('Please enter a valid email address'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
